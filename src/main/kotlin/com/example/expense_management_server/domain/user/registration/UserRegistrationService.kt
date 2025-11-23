@@ -1,12 +1,12 @@
 package com.example.expense_management_server.domain.user.registration
 
+import com.example.expense_management_server.domain.port.IEmailVerificationPort
+import com.example.expense_management_server.domain.port.IPasswordEncoderPort
+import com.example.expense_management_server.domain.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserRegistrationDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.registration.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.registration.exception.UserAlreadyExistsException
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -45,7 +45,7 @@ class UserRegistrationService(
                 email = userRegistrationModel.email,
                 nickname = userRegistrationModel.nickname,
                 passwordHash = passwordHash,
-                roles = listOf(UserRole.USER),
+                role = UserRole.USER,
                 isEmailVerified = false,
                 createdAt = OffsetDateTime.now(clock),
                 updatedAt = null,

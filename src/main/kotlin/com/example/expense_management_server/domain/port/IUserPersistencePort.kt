@@ -1,4 +1,4 @@
-package com.example.expense_management_server.domain.user.port
+package com.example.expense_management_server.domain.port
 
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 

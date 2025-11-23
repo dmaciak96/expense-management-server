@@ -1,12 +1,12 @@
 package com.example.expense_management_server.domain.user.registration
 
+import com.example.expense_management_server.domain.port.IEmailVerificationPort
+import com.example.expense_management_server.domain.port.IPasswordEncoderPort
+import com.example.expense_management_server.domain.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserRegistrationDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.registration.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.registration.exception.UserAlreadyExistsException
 import org.assertj.core.api.Assertions.assertThat
@@ -16,12 +16,17 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 import java.time.Clock
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.util.UUID
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 class UserRegistrationServiceTest {
@@ -73,7 +78,7 @@ class UserRegistrationServiceTest {
             email = REGISTRATION_MODEL.email,
             nickname = REGISTRATION_MODEL.nickname,
             passwordHash = ENCODED_PASSWORD,
-            roles = listOf(UserRole.USER),
+            role = UserRole.USER,
             isEmailVerified = false,
             createdAt = OffsetDateTime.now(clock),
             updatedAt = null,
@@ -98,7 +103,7 @@ class UserRegistrationServiceTest {
         assertThat(captured.email).isEqualTo(REGISTRATION_MODEL.email)
         assertThat(captured.nickname).isEqualTo(REGISTRATION_MODEL.nickname)
         assertThat(captured.passwordHash).isEqualTo(ENCODED_PASSWORD)
-        assertThat(captured.roles).containsExactly(UserRole.USER)
+        assertThat(captured.role).isEqualTo(UserRole.USER)
         assertThat(captured.isEmailVerified).isFalse()
         assertThat(captured.createdAt).isEqualTo(OffsetDateTime.now(clock))
         assertThat(captured.updatedAt).isNull()
@@ -126,7 +131,7 @@ class UserRegistrationServiceTest {
             email = REGISTRATION_MODEL.email,
             nickname = "existing",
             passwordHash = "hash",
-            roles = listOf(UserRole.USER),
+            role = UserRole.ADMIN,
             isEmailVerified = true,
             createdAt = OffsetDateTime.now(),
             updatedAt = null,

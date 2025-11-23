@@ -8,7 +8,7 @@ data class UserDomainModel(
     val email: String,
     val nickname: String?,
     val passwordHash: String,
-    val roles: List<UserRole>,
+    val role: UserRole,
     val isEmailVerified: Boolean,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime?,
