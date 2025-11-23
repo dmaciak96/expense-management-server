@@ -1,9 +1,11 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
-	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
-	id 'org.springframework.boot' version '3.5.7'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
+    id 'org.jetbrains.kotlin.jvm' version '2.2.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '2.2.21'
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '2.2.21'
 }
 
 group = 'com.example'
@@ -12,8 +14,12 @@ description = 'Expense management server application'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
 	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 24
 }
 
 repositories {
@@ -34,17 +40,19 @@ dependencies {
 }
 
 kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll '-Xjsr305=strict'
-	}
+    jvmToolchain(25)
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_24
+        freeCompilerArgs.addAll '-Xjsr305=strict', '-Xannotation-default-target=param-property'
+    }
 }
 
 allOpen {
-	annotation 'jakarta.persistence.Entity'
-	annotation 'jakarta.persistence.MappedSuperclass'
-	annotation 'jakarta.persistence.Embeddable'
+    annotation 'jakarta.persistence.Entity'
+    annotation 'jakarta.persistence.MappedSuperclass'
+    annotation 'jakarta.persistence.Embeddable'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
