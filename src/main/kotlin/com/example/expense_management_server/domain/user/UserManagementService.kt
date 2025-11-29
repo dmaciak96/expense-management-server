@@ -1,27 +1,30 @@
-package com.example.expense_management_server.domain.user.registration
+package com.example.expense_management_server.domain.user
 
+import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import com.example.expense_management_server.domain.port.IEmailVerificationPort
 import com.example.expense_management_server.domain.port.IPasswordEncoderPort
 import com.example.expense_management_server.domain.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.exception.PasswordValidationException
+import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
+import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserRegistrationDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.registration.exception.PasswordValidationException
-import com.example.expense_management_server.domain.user.registration.exception.UserAlreadyExistsException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @Service
-class UserRegistrationService(
+class UserManagementService(
     private val userPersistencePort: IUserPersistencePort,
     private val passwordEncoderPort: IPasswordEncoderPort,
     private val emailVerificationPort: IEmailVerificationPort,
     private val passwordValidator: PasswordValidator,
     private val clock: Clock,
-) : IUserRegistrationFacade {
+) : IUserManagementFacade {
 
     override fun registerNewUser(userRegistrationModel: UserRegistrationDomainModel): UserDomainModel {
         LOGGER.info { "Registering new user account" }
@@ -60,6 +63,12 @@ class UserRegistrationService(
         LOGGER.info { "Verification e-mail was sent to ${savedUserAccount.email}" }
 
         return savedUserAccount
+    }
+
+    override fun getUserById(id: UUID): UserDomainModel {
+        LOGGER.info { "Fetching registered user by id" }
+        val user = userPersistencePort.findUserAccountById(id) ?: throw UserNotFoundException()
+        return user
     }
 
     companion object {

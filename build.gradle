@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.2.21'
-    id 'org.jetbrains.kotlin.plugin.spring' version '2.2.21'
-    id 'org.springframework.boot' version '4.0.0'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.jetbrains.kotlin.plugin.jpa' version '2.2.21'
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dep.mgmt)
 }
 
 group = 'com.example'
@@ -27,17 +27,24 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-	runtimeOnly 'org.postgresql:postgresql'
-    implementation 'io.github.oshai:kotlin-logging:7.0.13'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.4.0'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation libs.spring.boot.starter.data.jpa
+    implementation libs.spring.boot.starter.web
+    implementation libs.jackson.module.kotlin
+    implementation libs.kotlin.reflect
+    implementation libs.kotlin.logging
+    implementation libs.spring.boot.starter.validation
+    implementation libs.spring.boot.starter.security
+    implementation libs.flyway
+    implementation libs.flyway.postgresql
+    developmentOnly libs.spring.boot.docker.compose
+    runtimeOnly libs.postgresql
+
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.spring.boot.starter.test
+    testImplementation libs.kotlin.test.junit5
+    testImplementation libs.archunit
+    testImplementation libs.mockito.kotlin
+    testImplementation libs.flyway.test
 }
 
 kotlin {

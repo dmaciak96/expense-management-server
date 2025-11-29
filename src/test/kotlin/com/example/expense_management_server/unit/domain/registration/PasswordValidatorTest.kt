@@ -1,5 +1,7 @@
-package com.example.expense_management_server.domain.user.registration
+package com.example.expense_management_server.unit.domain.registration
 
+import com.example.expense_management_server.domain.user.PasswordValidationCriteria
+import com.example.expense_management_server.domain.user.PasswordValidator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

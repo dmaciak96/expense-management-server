@@ -1,39 +1,20 @@
-# Read Me First
-The following was discovered as part of building this project:
+# Expense Management Server
+Managing shared expenses with friends has never been easier. This app helps you keep track of who paid for what, split costs fairly, and avoid awkward money conversations.
+Create balance groups, invite your friends, and add any expenses you want to share - the app will automatically divide the costs equally among all members. No more manual calculations, no more confusion, no more “who owes whom.”
+You’ll never have to wonder who owes what ever again!
 
-* The JVM level was changed from '25' to '21' as the Kotlin version does not support Java 25 yet.
-* The original package name 'com.example.expense-management-server' is invalid and this project uses 'com.example.expense_management_server' instead.
+This project serves as a backend application providing a REST API for full and convenient use, it requires a dedicated client application.
 
-# Getting Started
+# Application purpose
+This application was created for educational purposes. It is built in Kotlin using the Spring Boot framework and incorporates the following technologies:
+* **Spring Data JPA** – a Spring module used for database communication, 
+* **Spring Security** – a Spring module responsible for securing the application, 
+* **REST API** – the communication method used by client applications, 
+* **PostgreSQL** – the primary database used by the system, 
+* **JUnit & Mockito** – libraries for writing tests, 
+* **ArchUnit** – used in this project to verify architectural correctness, 
+* **Docker** – used to create and run the database container.
 
-### Reference Documentation
-For further reference, please consider the following sections:
+Project follows the **Hexagonal Architecture (Ports & Adapters)** approach, promoting clean separation between business logic and external systems.
 
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/3.5.7/gradle-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/3.5.7/gradle-plugin/packaging-oci-image.html)
-* [Spring Web](https://docs.spring.io/spring-boot/3.5.7/reference/web/servlet.html)
-* [Docker Compose Support](https://docs.spring.io/spring-boot/3.5.7/reference/features/dev-services.html#features.dev-services.docker-compose)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/3.5.7/reference/data/sql.html#data.sql.jpa-and-spring-data)
-
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-
-### Additional Links
-These additional references should also help you:
-
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
-
-### Docker Compose support
-This project contains a Docker Compose file named `compose.yaml`.
-In this file, the following services have been defined:
-
-* postgres: [`postgres:latest`](https://hub.docker.com/_/postgres)
-
-Please review the tags of the used images and set them to the same as you're running in production.
-
+# Running application

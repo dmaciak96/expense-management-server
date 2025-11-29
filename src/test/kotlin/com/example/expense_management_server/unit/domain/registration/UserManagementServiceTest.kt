@@ -1,4 +1,4 @@
-package com.example.expense_management_server.domain.user.registration
+package com.example.expense_management_server.unit.domain.registration
 
 import com.example.expense_management_server.domain.port.IEmailVerificationPort
 import com.example.expense_management_server.domain.port.IPasswordEncoderPort
@@ -7,8 +7,11 @@ import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserRegistrationDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.registration.exception.PasswordValidationException
-import com.example.expense_management_server.domain.user.registration.exception.UserAlreadyExistsException
+import com.example.expense_management_server.domain.user.PasswordValidationCriteria
+import com.example.expense_management_server.domain.user.PasswordValidator
+import com.example.expense_management_server.domain.user.UserManagementService
+import com.example.expense_management_server.domain.user.exception.PasswordValidationException
+import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,10 +29,10 @@ import java.time.Clock
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.util.*
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
-class UserRegistrationServiceTest {
+class UserManagementServiceTest {
 
     @Mock
     private lateinit var userPersistencePort: IUserPersistencePort
@@ -43,7 +46,7 @@ class UserRegistrationServiceTest {
     @Mock
     private lateinit var passwordValidator: PasswordValidator
 
-    private lateinit var userRegistrationService: UserRegistrationService
+    private lateinit var userRegistrationService: UserManagementService
 
     private val clock = Clock.fixed(
         Instant.parse("2018-04-29T10:15:30.00Z"),
@@ -52,7 +55,7 @@ class UserRegistrationServiceTest {
 
     @BeforeEach
     fun initialize() {
-        userRegistrationService = UserRegistrationService(
+        userRegistrationService = UserManagementService(
             userPersistencePort,
             passwordEncoderPort,
             emailVerificationPort,

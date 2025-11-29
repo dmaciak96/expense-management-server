@@ -1,4 +1,4 @@
-package com.example.expense_management_server.domain.user.registration
+package com.example.expense_management_server.domain.user
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
