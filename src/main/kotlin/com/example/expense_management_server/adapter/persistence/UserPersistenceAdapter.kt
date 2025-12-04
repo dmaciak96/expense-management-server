@@ -4,6 +4,8 @@ import com.example.expense_management_server.domain.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
+import java.util.UUID
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class UserPersistenceAdapter(
@@ -21,6 +23,13 @@ class UserPersistenceAdapter(
         LOGGER.info { "Get user account by e-mail address $email" }
         val user = userRepository.findByEmail(email) ?: return null
         return map(user)
+    }
+
+    override fun findUserAccountById(id: UUID): UserDomainModel? {
+        LOGGER.info { "Get user account by id" }
+        return userRepository.findById(id)
+            .map { map(it) }
+            .getOrNull()
     }
 
     private fun map(userModel: UserDomainModel): UserEntity =

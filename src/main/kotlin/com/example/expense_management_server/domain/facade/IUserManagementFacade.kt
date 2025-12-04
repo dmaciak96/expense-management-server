@@ -7,4 +7,5 @@ import java.util.UUID
 interface IUserManagementFacade {
     fun registerNewUser(userRegistrationModel: UserRegistrationDomainModel): UserDomainModel
     fun getUserById(id: UUID): UserDomainModel
+    fun getUserByEmail(email: String): UserDomainModel
 }

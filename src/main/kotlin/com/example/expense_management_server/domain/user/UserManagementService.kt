@@ -71,6 +71,12 @@ class UserManagementService(
         return user
     }
 
+    override fun getUserByEmail(email: String): UserDomainModel {
+        LOGGER.info { "Fetching registered user by email: $email" }
+        val user = userPersistencePort.findUserAccountByEmail(email) ?: throw UserNotFoundException()
+        return user
+    }
+
     companion object {
         private val LOGGER = KotlinLogging.logger {}
     }
