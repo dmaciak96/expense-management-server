@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class ExpenseManagementServerApplication
 
 fun main(args: Array<String>) {
-	runApplication<ExpenseManagementServerApplication>(*args)
+    runApplication<ExpenseManagementServerApplication>(*args)
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 class PasswordValidator {
 
-    fun checkIfPasswordIsValid(password: String): List<PasswordValidationCriteria> {
+    fun validate(password: String): List<PasswordValidationCriteria> {
         LOGGER.info { "Password validation in progress" }
         val criteriaNotMatched = PasswordValidationCriteria.entries
             .filter { it.isCriteriaNotMatched(password) }

@@ -16,7 +16,7 @@ data class UserDomainModel(
     val accountStatus: AccountStatus,
 )
 
-data class UserRegistrationDomainModel(
+data class UserHttpDomainModel(
     val email: String,
     val password: String,
     val nickname: String?

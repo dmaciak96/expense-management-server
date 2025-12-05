@@ -1,13 +1,14 @@
 package com.example.expense_management_server.adapter.api
 
-import com.example.expense_management_server.adapter.api.model.UserRegistrationRequest
+import com.example.expense_management_server.adapter.api.model.UserHttpRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
-import com.example.expense_management_server.domain.user.model.UserDomainModel
-import com.example.expense_management_server.domain.user.model.UserRegistrationDomainModel
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
+import com.example.expense_management_server.domain.user.exception.NicknameValidationException
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
+import com.example.expense_management_server.domain.user.model.UserDomainModel
+import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -32,12 +34,12 @@ class UserManagementController(
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun registerNewUser(@RequestBody @Valid userRegistrationRequest: UserRegistrationRequest): UserResponse {
+    fun registerNewUser(@RequestBody @Valid userHttpRequest: UserHttpRequest): UserResponse {
         val registeredUser = userManagementFacade.registerNewUser(
-            UserRegistrationDomainModel(
-                email = userRegistrationRequest.email,
-                password = userRegistrationRequest.password,
-                nickname = userRegistrationRequest.nickname,
+            UserHttpDomainModel(
+                email = userHttpRequest.email,
+                password = userHttpRequest.password,
+                nickname = userHttpRequest.nickname,
             )
         )
 
@@ -50,6 +52,23 @@ class UserManagementController(
         val user = userManagementFacade.getUserById(userId)
         // TODO: Check authenticated user before return
         return map(user)
+    }
+
+    @PutMapping("/{userId}")
+    fun updateUserAccount(
+        @PathVariable userId: UUID,
+        @RequestBody @Valid userHttpRequest: UserHttpRequest
+    ): UserResponse {
+        LOGGER.info { "Update account request received" }
+        // TODO: Check authenticated user before return
+        val updatedUser = userManagementFacade.updateUser(
+            userId, UserHttpDomainModel(
+                email = userHttpRequest.email,
+                password = userHttpRequest.password,
+                nickname = userHttpRequest.nickname,
+            )
+        )
+        return map(updatedUser)
     }
 
 
@@ -94,6 +113,15 @@ class UserRegistrationExceptionHandler {
     fun handleUserNotFoundException(ex: UserNotFoundException): ResponseEntity.HeadersBuilder<*> {
         LOGGER.warn { "User not found by e-mail" }
         return ResponseEntity.notFound()
+    }
+
+    @ExceptionHandler(NicknameValidationException::class)
+    fun handleNicknameValidationException(ex: NicknameValidationException): ResponseEntity<ProblemDetail> {
+        LOGGER.warn { "Password validation error: ${ex.message}" }
+        val error = ProblemDetail
+            .forStatusAndDetail(HttpStatusCode.valueOf(400), ex.message)
+        return ResponseEntity.badRequest()
+            .body(error)
     }
 
     companion object {

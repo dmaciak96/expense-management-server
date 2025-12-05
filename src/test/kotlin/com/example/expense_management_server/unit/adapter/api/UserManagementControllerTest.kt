@@ -1,11 +1,11 @@
 package com.example.expense_management_server.unit.adapter.api
 
 import com.example.expense_management_server.adapter.api.UserManagementController
-import com.example.expense_management_server.adapter.api.model.UserRegistrationRequest
+import com.example.expense_management_server.adapter.api.model.UserHttpRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
-import com.example.expense_management_server.domain.user.model.UserRegistrationDomainModel
+import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import org.assertj.core.api.Assertions.assertThat
@@ -52,6 +52,47 @@ class UserManagementControllerTest {
             .isEqualTo(USER_REGISTRATION_RESPONSE)
     }
 
+    @Test
+    fun `when asking for user details then get user from facade and map to response`() {
+        // given
+        whenever(userRegistrationFacade.getUserById(eq(USER_ID)))
+            .thenReturn(USER_DOMAIN_MODEL)
+
+        // when
+        val result = userManagementController.getUserDetails(USER_ID)
+
+        // then
+        verify(userRegistrationFacade).getUserById(eq(USER_ID))
+
+        assertThat(result)
+            .isEqualTo(USER_REGISTRATION_RESPONSE)
+    }
+
+    @Test
+    fun `when updating user account then call facade and map response`() {
+        // given
+        whenever(
+            userRegistrationFacade.updateUser(
+                eq(USER_ID),
+                eq(USER_REGISTRATION_DOMAIN_MODEL)
+            )
+        ).thenReturn(USER_DOMAIN_MODEL)
+
+        // when
+        val result = userManagementController.updateUserAccount(
+            USER_ID,
+            USER_REGISTRATION_REQUEST
+        )
+
+        // then
+        verify(userRegistrationFacade)
+            .updateUser(eq(USER_ID), eq(USER_REGISTRATION_DOMAIN_MODEL))
+
+        assertThat(result)
+            .isEqualTo(USER_REGISTRATION_RESPONSE)
+    }
+
+
     companion object {
         private val USER_ID = UUID.randomUUID()
         private val CREATED_AT = OffsetDateTime.parse("2007-12-03T10:15:30+01:00")
@@ -73,13 +114,13 @@ class UserManagementControllerTest {
             accountStatus = AccountStatus.ACTIVE
         )
 
-        private val USER_REGISTRATION_DOMAIN_MODEL = UserRegistrationDomainModel(
+        private val USER_REGISTRATION_DOMAIN_MODEL = UserHttpDomainModel(
             email = EMAIL,
             password = PASSWORD,
             nickname = NICKNAME,
         )
 
-        private val USER_REGISTRATION_REQUEST = UserRegistrationRequest(
+        private val USER_REGISTRATION_REQUEST = UserHttpRequest(
             email = EMAIL,
             password = PASSWORD,
             nickname = NICKNAME,

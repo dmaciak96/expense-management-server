@@ -1,6 +1,7 @@
 package com.example.expense_management_server.adapter.persistence
 
 import com.example.expense_management_server.domain.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
@@ -12,10 +13,26 @@ class UserPersistenceAdapter(
     private val userRepository: UserRepository
 ) : IUserPersistencePort {
 
-    override fun saveUserAccount(userModel: UserDomainModel): UserDomainModel {
+    override fun saveOrUpdateUserAccount(userModel: UserDomainModel): UserDomainModel =
+        if (userModel.id == null) {
+            saveUserAccount(userModel)
+        } else {
+            updateUserAccount(userModel)
+        }
+
+    private fun saveUserAccount(userModel: UserDomainModel): UserDomainModel {
         LOGGER.info { "Saving user account in database" }
         val savedUser = userRepository.save(map(userModel))
         LOGGER.info { "User account saved in database" }
+        return map(savedUser)
+    }
+
+    private fun updateUserAccount(userModel: UserDomainModel): UserDomainModel {
+        LOGGER.info { "Updating user account ${userModel.id}" }
+        val version = userRepository.findById(userModel.id!!).map { it.version }
+            .orElseThrow { UserNotFoundException() }
+        val savedUser = userRepository.saveAndFlush(map(userModel, version))
+        LOGGER.info { "User account was updated" }
         return map(savedUser)
     }
 
@@ -32,7 +49,7 @@ class UserPersistenceAdapter(
             .getOrNull()
     }
 
-    private fun map(userModel: UserDomainModel): UserEntity =
+    private fun map(userModel: UserDomainModel, version: Int? = null): UserEntity =
         UserEntity(
             id = userModel.id,
             email = userModel.email,
@@ -43,7 +60,8 @@ class UserPersistenceAdapter(
             createdAt = userModel.createdAt,
             updatedAt = userModel.updatedAt,
             lastLoginAt = userModel.lastLoginAt,
-            accountStatus = userModel.accountStatus
+            accountStatus = userModel.accountStatus,
+            version = version
         )
 
     private fun map(userEntity: UserEntity): UserDomainModel =

@@ -21,13 +21,13 @@ data class UserEntity(
     val email: String,
     val nickname: String?,
     val passwordHash: String,
-
-    @Enumerated(EnumType.STRING)
-    val role: UserRole,
     val isEmailVerified: Boolean,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime?,
     val lastLoginAt: OffsetDateTime?,
+
+    @Enumerated(EnumType.STRING)
+    val role: UserRole,
 
     @Enumerated(EnumType.STRING)
     val accountStatus: AccountStatus,

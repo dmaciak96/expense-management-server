@@ -1,4 +1,4 @@
-package com.example.expense_management_server.unit.domain.registration
+package com.example.expense_management_server.unit.domain.user
 
 import com.example.expense_management_server.domain.user.PasswordValidationCriteria
 import com.example.expense_management_server.domain.user.PasswordValidator
@@ -15,7 +15,7 @@ class PasswordValidatorTest {
         val password = "1aD@"
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactly(PasswordValidationCriteria.LENGTH)
@@ -27,7 +27,7 @@ class PasswordValidatorTest {
         val password = "1AD@DDDDDDDD"
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactly(PasswordValidationCriteria.ONE_LOWER_CASE)
@@ -40,7 +40,7 @@ class PasswordValidatorTest {
         val password = "1ad@dddddddd"
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactly(PasswordValidationCriteria.ONE_UPPER_CASE)
@@ -53,7 +53,7 @@ class PasswordValidatorTest {
         val password = "aaD@DDDDDDDD"
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactly(PasswordValidationCriteria.ONE_NUMBER)
@@ -65,7 +65,7 @@ class PasswordValidatorTest {
         val password = "1aaDDDDDDDDD"
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactly(PasswordValidationCriteria.ONE_SPECIAL_CHARACTER)
@@ -78,7 +78,7 @@ class PasswordValidatorTest {
         val password = "1a@DDD DDDDDD "
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactly(PasswordValidationCriteria.NO_SPACE)
@@ -90,7 +90,7 @@ class PasswordValidatorTest {
         val password = ""
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).containsExactlyInAnyOrder(*PasswordValidationCriteria.entries.toTypedArray())
@@ -102,7 +102,7 @@ class PasswordValidatorTest {
         val password = "p@Ssw0rd"
 
         // when
-        val result = passwordValidator.checkIfPasswordIsValid(password)
+        val result = passwordValidator.validate(password)
 
         // then
         assertThat(result).isEmpty()
