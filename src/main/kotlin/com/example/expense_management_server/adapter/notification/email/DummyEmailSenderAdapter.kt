@@ -1,6 +1,6 @@
 package com.example.expense_management_server.adapter.notification.email
 
-import com.example.expense_management_server.domain.port.IEmailVerificationPort
+import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 

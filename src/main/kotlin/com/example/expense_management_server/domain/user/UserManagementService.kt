@@ -1,9 +1,9 @@
 package com.example.expense_management_server.domain.user
 
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
-import com.example.expense_management_server.domain.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
+import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
+import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.exception.NicknameValidationException
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
@@ -132,6 +132,13 @@ class UserManagementService(
         }
 
         return savedUserAccount
+    }
+
+    override fun deleteUser(userId: UUID) {
+        LOGGER.info { "Removing user from system" }
+        val userToRemove = userPersistencePort.findUserAccountById(userId) ?: throw UserNotFoundException()
+        userPersistencePort.deleteUser(userToRemove)
+        LOGGER.info { "User ${userToRemove.email} was successfully removed" }
     }
 
     private fun checkIfEmailAlreadyExists(email: String) {

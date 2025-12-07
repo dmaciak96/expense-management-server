@@ -1,6 +1,6 @@
 package com.example.expense_management_server.adapter.persistence
 
-import com.example.expense_management_server.domain.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -21,32 +21,37 @@ class UserPersistenceAdapter(
         }
 
     private fun saveUserAccount(userModel: UserDomainModel): UserDomainModel {
-        LOGGER.info { "Saving user account in database" }
+        LOGGER.debug { "Saving user account in database" }
         val savedUser = userRepository.save(map(userModel))
-        LOGGER.info { "User account saved in database" }
+        LOGGER.debug { "User account saved in database" }
         return map(savedUser)
     }
 
     private fun updateUserAccount(userModel: UserDomainModel): UserDomainModel {
-        LOGGER.info { "Updating user account ${userModel.id}" }
+        LOGGER.debug { "Updating user account ${userModel.id}" }
         val version = userRepository.findById(userModel.id!!).map { it.version }
             .orElseThrow { UserNotFoundException() }
         val savedUser = userRepository.saveAndFlush(map(userModel, version))
-        LOGGER.info { "User account was updated" }
+        LOGGER.debug { "User account was updated" }
         return map(savedUser)
     }
 
     override fun findUserAccountByEmail(email: String): UserDomainModel? {
-        LOGGER.info { "Get user account by e-mail address $email" }
+        LOGGER.debug { "Get user account by e-mail address $email" }
         val user = userRepository.findByEmail(email) ?: return null
         return map(user)
     }
 
     override fun findUserAccountById(id: UUID): UserDomainModel? {
-        LOGGER.info { "Get user account by id" }
+        LOGGER.debug { "Get user account by id" }
         return userRepository.findById(id)
             .map { map(it) }
             .getOrNull()
+    }
+
+    override fun deleteUser(userDomainModel: UserDomainModel) {
+        userRepository.delete(map(userDomainModel))
+        LOGGER.debug { "User ${userDomainModel.email} was removed from database" }
     }
 
     private fun map(userModel: UserDomainModel, version: Int? = null): UserEntity =

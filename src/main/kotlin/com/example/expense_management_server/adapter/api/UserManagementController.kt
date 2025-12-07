@@ -17,6 +17,7 @@ import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -70,6 +71,16 @@ class UserManagementController(
             )
         )
         return map(updatedUser)
+    }
+
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(IS_OWNER_OR_ADMIN_MATCHER)
+    fun deleteUserAccount(
+        @PathVariable userId: UUID,
+    ) {
+        LOGGER.info { "Remove account request received" }
+        userManagementFacade.deleteUser(userId)
     }
 
 

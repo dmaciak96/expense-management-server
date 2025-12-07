@@ -1,8 +1,5 @@
 package com.example.expense_management_server.unit.domain.user
 
-import com.example.expense_management_server.domain.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.PasswordValidationCriteria
 import com.example.expense_management_server.domain.user.PasswordValidator
 import com.example.expense_management_server.domain.user.UserManagementService
@@ -14,6 +11,9 @@ import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
+import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
+import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
+import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -542,6 +542,39 @@ class UserManagementServiceTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun `should delete existing user`() {
+        // given
+        whenever(userPersistencePort.findUserAccountById(USER_ID))
+            .thenReturn(USER_ACCOUNT_MODEL)
+
+        // when
+        userManagementService.deleteUser(USER_ID)
+
+        // then
+        verify(userPersistencePort).findUserAccountById(USER_ID)
+        verify(userPersistencePort).deleteUser(USER_ACCOUNT_MODEL)
+
+        verifyNoMoreInteractions(userPersistencePort)
+        verifyNoInteractions(passwordValidator, passwordEncoderPort, emailVerificationPort)
+    }
+
+    @Test
+    fun `should throw UserNotFoundException when deleting non existing user`() {
+        // given
+        whenever(userPersistencePort.findUserAccountById(NOT_EXISTING_USER_ID))
+            .thenReturn(null)
+
+        // when & then
+        assertThrows<UserNotFoundException> {
+            userManagementService.deleteUser(NOT_EXISTING_USER_ID)
+        }
+
+        verify(userPersistencePort).findUserAccountById(NOT_EXISTING_USER_ID)
+        verifyNoMoreInteractions(userPersistencePort)
+        verifyNoInteractions(passwordValidator, passwordEncoderPort, emailVerificationPort)
     }
 
     companion object {

@@ -9,4 +9,5 @@ interface IUserManagementFacade {
     fun getUserById(id: UUID): UserDomainModel
     fun getUserByEmail(email: String): UserDomainModel
     fun updateUser(userId: UUID, userUpdateModel: UserHttpDomainModel): UserDomainModel
+    fun deleteUser(userId: UUID)
 }
