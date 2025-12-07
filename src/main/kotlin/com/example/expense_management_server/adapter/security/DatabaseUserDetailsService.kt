@@ -1,7 +1,7 @@
 package com.example.expense_management_server.adapter.security
 
+import com.example.expense_management_server.adapter.security.model.UserAccount
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
@@ -13,9 +13,11 @@ class DatabaseUserDetailsService(
 
     override fun loadUserByUsername(email: String): UserDetails {
         val userDomainModel = userManagementFacade.getUserByEmail(email)
-        return User.withUsername(userDomainModel.email)
-            .password(userDomainModel.passwordHash)
-            .roles(userDomainModel.role.name)
-            .build()
+        return UserAccount(
+            id = userDomainModel.id!!,
+            email = userDomainModel.email,
+            passwordHash = userDomainModel.passwordHash,
+            role = userDomainModel.role
+        )
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -48,19 +49,19 @@ class UserManagementController(
     }
 
     @GetMapping("/{userId}")
+    @PreAuthorize(IS_OWNER_OR_ADMIN_MATCHER)
     fun getUserDetails(@PathVariable userId: UUID): UserResponse {
         val user = userManagementFacade.getUserById(userId)
-        // TODO: Check authenticated user before return
         return map(user)
     }
 
     @PutMapping("/{userId}")
+    @PreAuthorize(IS_OWNER_OR_ADMIN_MATCHER)
     fun updateUserAccount(
         @PathVariable userId: UUID,
         @RequestBody @Valid userHttpRequest: UserHttpRequest
     ): UserResponse {
         LOGGER.info { "Update account request received" }
-        // TODO: Check authenticated user before return
         val updatedUser = userManagementFacade.updateUser(
             userId, UserHttpDomainModel(
                 email = userHttpRequest.email,
@@ -86,6 +87,7 @@ class UserManagementController(
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
+        private const val IS_OWNER_OR_ADMIN_MATCHER = "#userId == principal.id || hasRole('ADMIN')"
     }
 }
 
