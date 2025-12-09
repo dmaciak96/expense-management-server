@@ -5,6 +5,7 @@ spring-dep-mgmt = "1.1.7"
 kotlin-logging = "7.0.13"
 archunit = "1.4.1"
 mockito-kotlin = "5.4.0"
+testcontainers = "1.21.3"
 
 
 [plugins]
@@ -34,3 +35,5 @@ kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
 archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 flyway-test = { module = "org.springframework.boot:spring-boot-starter-flyway-test" }
+testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }

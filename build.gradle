@@ -45,6 +45,8 @@ dependencies {
     testImplementation libs.archunit
     testImplementation libs.mockito.kotlin
     testImplementation libs.flyway.test
+    testImplementation libs.testcontainers.junit
+    testImplementation libs.testcontainers.postgresql
 }
 
 kotlin {
