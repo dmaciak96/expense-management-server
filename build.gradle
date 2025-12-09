@@ -1,9 +1,11 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
-	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
-	id 'org.springframework.boot' version '3.5.7'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dep.mgmt)
 }
 
 group = 'com.example'
@@ -12,8 +14,12 @@ description = 'Expense management server application'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
 	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 24
 }
 
 repositories {
@@ -21,29 +27,40 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-	runtimeOnly 'org.postgresql:postgresql'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation libs.spring.boot.starter.data.jpa
+    implementation libs.spring.boot.starter.web
+    implementation libs.jackson.module.kotlin
+    implementation libs.kotlin.reflect
+    implementation libs.kotlin.logging
+    implementation libs.spring.boot.starter.validation
+    implementation libs.spring.boot.starter.security
+    implementation libs.flyway
+    implementation libs.flyway.postgresql
+    developmentOnly libs.spring.boot.docker.compose
+    runtimeOnly libs.postgresql
+
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.spring.boot.starter.test
+    testImplementation libs.kotlin.test.junit5
+    testImplementation libs.archunit
+    testImplementation libs.mockito.kotlin
+    testImplementation libs.flyway.test
 }
 
 kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll '-Xjsr305=strict'
-	}
+    jvmToolchain(25)
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_24
+        freeCompilerArgs.addAll '-Xjsr305=strict', '-Xannotation-default-target=param-property'
+    }
 }
 
 allOpen {
-	annotation 'jakarta.persistence.Entity'
-	annotation 'jakarta.persistence.MappedSuperclass'
-	annotation 'jakarta.persistence.Embeddable'
+    annotation 'jakarta.persistence.Entity'
+    annotation 'jakarta.persistence.MappedSuperclass'
+    annotation 'jakarta.persistence.Embeddable'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
