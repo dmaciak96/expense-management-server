@@ -31,6 +31,8 @@ flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
 
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-restclient-test = { module = "org.springframework.boot:spring-boot-starter-restclient-test" }
+spring-boot-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
 archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }

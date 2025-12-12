@@ -17,4 +17,18 @@ This application was created for educational purposes. It is built in Kotlin usi
 
 Project follows the **Hexagonal Architecture (Ports & Adapters)** approach, promoting clean separation between business logic and external systems.
 
-# Running application
+# Testing
+To run all types of tests with a single command, follow the steps below:
+1. Start the Docker environment - this is required because the project uses Testcontainers for integration tests,
+2. Run `./gradlew test` to execute all tests in the project.
+
+## Running Unit Tests
+To run only unit tests, execute:
+`./gradlew test --tests com.example.expense_management_server.unit.*`
+
+## Running Integration Tests
+1. Start the Docker environment - this is required because the project uses Testcontainers,
+2. Run `./gradlew test --tests com.example.expense_management_server.integration.*`
+
+## Running Architecture Tests
+To run architecture tests, execute: `./gradlew test --tests com.example.expense_management_server.architecture.*`

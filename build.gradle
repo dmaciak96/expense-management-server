@@ -41,6 +41,8 @@ dependencies {
 
     testRuntimeOnly libs.junit.platform.launcher
     testImplementation libs.spring.boot.starter.test
+    testImplementation libs.spring.boot.restclient.test
+    testImplementation libs.spring.boot.webmvc.test
     testImplementation libs.kotlin.test.junit5
     testImplementation libs.archunit
     testImplementation libs.mockito.kotlin
