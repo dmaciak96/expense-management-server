@@ -89,7 +89,7 @@ class UserManagementController(
             id = userDomainModel.id,
             email = userDomainModel.email,
             nickname = userDomainModel.nickname,
-            isEmailVerified = userDomainModel.isEmailVerified,
+            emailVerified = userDomainModel.isEmailVerified,
             createdAt = userDomainModel.createdAt,
             updatedAt = userDomainModel.updatedAt,
             lastLoginAt = userDomainModel.lastLoginAt,
@@ -130,7 +130,7 @@ class UserRegistrationExceptionHandler {
 
     @ExceptionHandler(NicknameValidationException::class)
     fun handleNicknameValidationException(ex: NicknameValidationException): ResponseEntity<ProblemDetail> {
-        LOGGER.warn { "Password validation error: ${ex.message}" }
+        LOGGER.warn { "Nickname validation error: ${ex.message}" }
         val error = ProblemDetail
             .forStatusAndDetail(HttpStatusCode.valueOf(400), ex.message)
         return ResponseEntity.badRequest()

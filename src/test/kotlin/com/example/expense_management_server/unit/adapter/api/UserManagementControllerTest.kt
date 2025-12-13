@@ -3,11 +3,11 @@ package com.example.expense_management_server.unit.adapter.api
 import com.example.expense_management_server.adapter.api.UserManagementController
 import com.example.expense_management_server.adapter.api.model.UserHttpRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
+import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -130,7 +130,7 @@ class UserManagementControllerTest {
             id = USER_ID,
             email = EMAIL,
             nickname = NICKNAME,
-            isEmailVerified = false,
+            emailVerified = false,
             createdAt = CREATED_AT,
             updatedAt = null,
             lastLoginAt = null,

@@ -8,7 +8,7 @@ data class UserResponse(
     val id: UUID?,
     val email: String,
     val nickname: String?,
-    val isEmailVerified: Boolean,
+    val emailVerified: Boolean,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime?,
     val lastLoginAt: OffsetDateTime?,
