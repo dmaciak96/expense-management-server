@@ -1,6 +1,6 @@
 package com.example.expense_management_server.adapter.api
 
-import com.example.expense_management_server.adapter.api.model.UserHttpRequest
+import com.example.expense_management_server.adapter.api.model.UserRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import com.example.expense_management_server.domain.user.exception.NicknameValidationException
@@ -36,12 +36,12 @@ class UserManagementController(
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun registerNewUser(@RequestBody @Valid userHttpRequest: UserHttpRequest): UserResponse {
+    fun registerNewUser(@RequestBody @Valid userRequest: UserRequest): UserResponse {
         val registeredUser = userManagementFacade.registerNewUser(
             UserHttpDomainModel(
-                email = userHttpRequest.email,
-                password = userHttpRequest.password,
-                nickname = userHttpRequest.nickname,
+                email = userRequest.email,
+                password = userRequest.password,
+                nickname = userRequest.nickname,
             )
         )
 
@@ -60,14 +60,14 @@ class UserManagementController(
     @PreAuthorize(IS_OWNER_OR_ADMIN_MATCHER)
     fun updateUserAccount(
         @PathVariable userId: UUID,
-        @RequestBody @Valid userHttpRequest: UserHttpRequest
+        @RequestBody @Valid userRequest: UserRequest
     ): UserResponse {
         LOGGER.info { "Update account request received" }
         val updatedUser = userManagementFacade.updateUser(
             userId, UserHttpDomainModel(
-                email = userHttpRequest.email,
-                password = userHttpRequest.password,
-                nickname = userHttpRequest.nickname,
+                email = userRequest.email,
+                password = userRequest.password,
+                nickname = userRequest.nickname,
             )
         )
         return map(updatedUser)

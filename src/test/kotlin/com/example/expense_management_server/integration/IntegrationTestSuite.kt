@@ -1,7 +1,7 @@
 package com.example.expense_management_server.integration
 
-import com.example.expense_management_server.adapter.persistence.UserEntity
-import com.example.expense_management_server.adapter.persistence.UserRepository
+import com.example.expense_management_server.adapter.persistence.model.UserEntity
+import com.example.expense_management_server.adapter.persistence.repository.UserRepository
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserRole
 import org.junit.jupiter.api.AfterEach

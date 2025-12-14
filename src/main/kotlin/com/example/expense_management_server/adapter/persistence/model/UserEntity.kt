@@ -1,4 +1,4 @@
-package com.example.expense_management_server.adapter.persistence
+package com.example.expense_management_server.adapter.persistence.model
 
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserRole
@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.Version
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -34,4 +35,7 @@ data class UserEntity(
 
     @Version
     val version: Int? = null,
+
+    @ManyToMany(mappedBy = "groupMembers")
+    val balanceGroups: Set<BalanceGroupEntity> = emptySet(),
 )

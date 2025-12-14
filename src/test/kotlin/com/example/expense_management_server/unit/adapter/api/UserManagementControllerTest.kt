@@ -1,7 +1,7 @@
 package com.example.expense_management_server.unit.adapter.api
 
 import com.example.expense_management_server.adapter.api.UserManagementController
-import com.example.expense_management_server.adapter.api.model.UserHttpRequest
+import com.example.expense_management_server.adapter.api.model.UserRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import com.example.expense_management_server.domain.user.model.AccountStatus
@@ -120,7 +120,7 @@ class UserManagementControllerTest {
             nickname = NICKNAME,
         )
 
-        private val USER_REGISTRATION_REQUEST = UserHttpRequest(
+        private val USER_REGISTRATION_REQUEST = UserRequest(
             email = EMAIL,
             password = PASSWORD,
             nickname = NICKNAME,

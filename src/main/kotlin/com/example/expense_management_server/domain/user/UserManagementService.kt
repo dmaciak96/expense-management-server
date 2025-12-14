@@ -1,9 +1,6 @@
 package com.example.expense_management_server.domain.user
 
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
-import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.exception.NicknameValidationException
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
@@ -12,6 +9,9 @@ import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
+import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
+import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
+import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.time.Clock

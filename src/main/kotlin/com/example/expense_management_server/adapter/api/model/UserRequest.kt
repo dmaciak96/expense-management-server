@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
-data class UserHttpRequest(
+data class UserRequest(
 
     @Email
     @NotNull
