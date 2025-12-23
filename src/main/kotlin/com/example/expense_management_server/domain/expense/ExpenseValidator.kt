@@ -1,0 +1,108 @@
+package com.example.expense_management_server.domain.expense
+
+import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
+import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
+import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.stereotype.Component
+import java.util.UUID
+
+@Component
+class ExpenseValidator(
+    private val expensePersistencePort: IExpensePersistencePort,
+    private val balanceGroupPersistencePort: IBalanceGroupPersistencePort,
+    private val userPersistencePort: IUserPersistencePort,
+) {
+
+    fun validate(expense: ExpenseDomainModel) {
+        checkIfOwnerExists(expense.expenseOwnerId)
+        checkBalanceGroupExists(expense.balanceGroupId)
+        checkExpenseOwnerIsGroupMember(expense.balanceGroupId, expense.expenseOwnerId)
+        checkIfNameIsBlank(expense.name)
+        checkIfAmountIsLessThanZero(expense.amount)
+    }
+
+    fun validateForUpdate(expenseId: UUID, expenseUpdateData: ExpenseDomainModel) {
+        checkIfExpenseExists(expenseId)
+        validate(expenseUpdateData)
+        val existingExpense = expensePersistencePort.getById(expenseId)!!
+        checkIfBalanceGroupWasChanged(existingExpense, expenseUpdateData)
+        checkIfExpenseOwnerWasChanged(existingExpense, expenseUpdateData)
+    }
+
+    fun checkIfExpenseExists(expenseId: UUID) {
+        if (expensePersistencePort.getById(expenseId) == null) {
+            LOGGER.debug { "Expense $expenseId not found" }
+            throw ExpenseValidationException("Expense not found")
+        }
+        LOGGER.debug { "Expense $expenseId exists" }
+    }
+
+    fun checkBalanceGroupExists(balanceGroupId: UUID) {
+        val balanceGroup = balanceGroupPersistencePort.getById(balanceGroupId)
+        if (balanceGroup == null) {
+            LOGGER.debug { "Balance group ($balanceGroupId) not found, expense cannot be created" }
+            throw ExpenseValidationException("Balance group does not exist")
+        }
+        LOGGER.debug { "BalanceGroup ($balanceGroupId) exists" }
+    }
+
+    private fun checkExpenseOwnerIsGroupMember(balanceGroupId: UUID, expenseOwnerId: UUID) {
+        val balanceGroup = balanceGroupPersistencePort.getById(balanceGroupId)!!
+        if (!balanceGroup.groupMemberIds.contains(expenseOwnerId)) {
+            LOGGER.debug { "Expense creator ($expenseOwnerId) is not a member of balance group ($balanceGroupId)" }
+            throw ExpenseValidationException("Expense creator is not a member of balance group ($balanceGroupId), expense cannot be created")
+        }
+        LOGGER.debug { "Expense creator is valid balance group member ($balanceGroupId)" }
+    }
+
+    private fun checkIfBalanceGroupWasChanged(
+        existingExpense: ExpenseDomainModel,
+        expenseUpdateData: ExpenseDomainModel
+    ) {
+        if (existingExpense.balanceGroupId != expenseUpdateData.balanceGroupId) {
+            LOGGER.debug { "Tried to change balance group for expense ${existingExpense.id}. This is not supported" }
+            throw ExpenseValidationException("Moving expenses between balance groups is not supported")
+        }
+    }
+
+    private fun checkIfExpenseOwnerWasChanged(
+        existingExpense: ExpenseDomainModel,
+        expenseUpdateData: ExpenseDomainModel
+    ) {
+        if (existingExpense.expenseOwnerId != expenseUpdateData.expenseOwnerId) {
+            LOGGER.debug { "Tried to change expense owner for expense ${existingExpense.id}. This is not supported" }
+            throw ExpenseValidationException("Changing expense owner for expense ${existingExpense.id}")
+        }
+    }
+
+    private fun checkIfOwnerExists(ownerId: UUID) {
+        val owner = userPersistencePort.findUserAccountById(ownerId)
+        if (owner == null) {
+            LOGGER.debug { "Expense owner ($ownerId) not found" }
+            throw ExpenseValidationException("Expense owner does not exist")
+        }
+    }
+
+    private fun checkIfNameIsBlank(name: String) {
+        if (name.isBlank()) {
+            LOGGER.debug { "Expense name ($name) is blank, expense cannot be created" }
+            throw ExpenseValidationException("Expense name cannot contains whitespaces only")
+        }
+        LOGGER.debug { "Expense name ($name) is valid" }
+    }
+
+    private fun checkIfAmountIsLessThanZero(amount: Double) {
+        if (amount <= 0.0) {
+            LOGGER.debug { "Expense amount ($amount) is less than zero, expense cannot be created" }
+            throw ExpenseValidationException("Amount must be positive value")
+        }
+        LOGGER.debug { "Expense amount ($amount) is valid" }
+    }
+
+    companion object {
+        private val LOGGER = KotlinLogging.logger {}
+    }
+}

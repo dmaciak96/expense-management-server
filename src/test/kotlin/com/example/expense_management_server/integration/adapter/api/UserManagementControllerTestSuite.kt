@@ -1,8 +1,8 @@
 package com.example.expense_management_server.integration.adapter.api
 
-import com.example.expense_management_server.adapter.api.model.UserHttpRequest
+import com.example.expense_management_server.adapter.api.model.UserRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
-import com.example.expense_management_server.adapter.persistence.UserEntity
+import com.example.expense_management_server.adapter.persistence.model.UserEntity
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserRole
 import com.example.expense_management_server.integration.IntegrationTestSuite
@@ -19,7 +19,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
         restTestClient.post()
             .uri("/users")
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = VALID_EMAIL,
                     password = VALID_PASSWORD,
                     nickname = VALID_NICKNAME,
@@ -46,7 +46,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
         restTestClient.post()
             .uri("/users")
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = STANDARD_USER_EMAIL,
                     password = VALID_PASSWORD,
                     nickname = VALID_NICKNAME,
@@ -67,7 +67,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
         restTestClient.post()
             .uri("/users")
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = VALID_EMAIL,
                     password = "simplePassword",
                     nickname = VALID_NICKNAME,
@@ -170,7 +170,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = updatedEmail,
                     password = updatedPassword,
                     nickname = updatedNickname,
@@ -216,7 +216,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = updatedEmail,
                     password = VALID_PASSWORD,
                     nickname = updatedNickname,
@@ -249,7 +249,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = updatedEmail,
                     password = VALID_PASSWORD,
                     nickname = VALID_NICKNAME,
@@ -282,7 +282,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = updatedEmail,
                     password = VALID_PASSWORD,
                     nickname = VALID_NICKNAME,
@@ -309,7 +309,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = VALID_EMAIL,
                     password = updatedPassword,
                     nickname = VALID_NICKNAME,
@@ -334,7 +334,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = VALID_EMAIL,
                     password = VALID_PASSWORD,
                     nickname = "",
@@ -363,7 +363,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = updatedEmail,
                     password = updatedPassword,
                     nickname = updatedNickname,
@@ -386,7 +386,7 @@ class UserManagementControllerTestSuite : IntegrationTestSuite() {
             .uri("/users/${user.id}")
             .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
             .body(
-                UserHttpRequest(
+                UserRequest(
                     email = updatedEmail,
                     password = updatedPassword,
                     nickname = updatedNickname,
