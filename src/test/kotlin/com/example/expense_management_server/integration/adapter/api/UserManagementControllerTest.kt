@@ -5,14 +5,14 @@ import com.example.expense_management_server.adapter.api.model.UserResponse
 import com.example.expense_management_server.adapter.persistence.model.UserEntity
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.integration.IntegrationTestSuite
+import com.example.expense_management_server.integration.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.client.expectBody
 import java.time.OffsetDateTime
 import kotlin.test.Test
 
-class UserManagementControllerTestSuite : IntegrationTestSuite() {
+class UserManagementControllerTest : IntegrationTest() {
 
     @Test
     fun `when provided proper registration data then new user should be registered`() {

@@ -14,28 +14,41 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Entity
-data class UserEntity(
+class UserEntity(
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID?,
-    val email: String,
-    val nickname: String?,
-    val passwordHash: String,
-    val isEmailVerified: Boolean,
-    val createdAt: OffsetDateTime,
-    val updatedAt: OffsetDateTime?,
-    val lastLoginAt: OffsetDateTime?,
+    var id: UUID?,
+    var email: String,
+    var nickname: String?,
+    var passwordHash: String,
+    var isEmailVerified: Boolean,
+    var createdAt: OffsetDateTime,
+    var updatedAt: OffsetDateTime?,
+    var lastLoginAt: OffsetDateTime?,
 
     @Enumerated(EnumType.STRING)
-    val role: UserRole,
+    var role: UserRole,
 
     @Enumerated(EnumType.STRING)
-    val accountStatus: AccountStatus,
+    var accountStatus: AccountStatus,
 
     @Version
-    val version: Int? = null,
+    var version: Int? = null,
 
     @ManyToMany(mappedBy = "groupMembers")
-    val balanceGroups: Set<BalanceGroupEntity> = emptySet(),
-)
+    var balanceGroups: Set<BalanceGroupEntity> = emptySet(),
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as UserEntity
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
+}

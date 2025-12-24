@@ -17,22 +17,22 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Entity
-data class BalanceGroupEntity(
+class BalanceGroupEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID?,
+    var id: UUID?,
 
     @Version
-    val version: Int? = null,
+    var version: Int? = null,
 
     @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by_id", nullable = false)
-    val createdBy: UserEntity? = null,
+    var createdBy: UserEntity? = null,
 
-    val createdAt: OffsetDateTime,
-    val updatedAt: OffsetDateTime?,
-    val groupName: String,
+    var createdAt: OffsetDateTime,
+    var updatedAt: OffsetDateTime?,
+    var groupName: String,
 
     @ManyToMany
     @JoinTable(
@@ -40,12 +40,25 @@ data class BalanceGroupEntity(
         joinColumns = [JoinColumn(name = "balance_group_id", nullable = false)],
         inverseJoinColumns = [JoinColumn(name = "user_id", nullable = false)]
     )
-    val groupMembers: Set<UserEntity> = emptySet(),
+    var groupMembers: Set<UserEntity> = emptySet(),
 
     @OneToMany(
         mappedBy = "balanceGroup",
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-    val expenses: List<ExpenseEntity> = emptyList(),
-)
+    var expenses: List<ExpenseEntity> = emptyList(),
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as BalanceGroupEntity
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
+}

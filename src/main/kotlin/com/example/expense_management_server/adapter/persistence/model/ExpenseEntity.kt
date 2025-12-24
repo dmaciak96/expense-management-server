@@ -16,28 +16,41 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Entity
-data class ExpenseEntity(
+class ExpenseEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID?,
+    var id: UUID?,
 
     @Version
-    val version: Int? = null,
+    var version: Int? = null,
 
     @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by_id", nullable = false)
-    val createdBy: UserEntity? = null,
+    var createdBy: UserEntity? = null,
 
-    val createdAt: OffsetDateTime,
-    val updatedAt: OffsetDateTime?,
-    val name: String,
-    val amount: Double,
+    var createdAt: OffsetDateTime,
+    var updatedAt: OffsetDateTime?,
+    var name: String,
+    var amount: Double,
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "balance_group_id", nullable = false)
-    val balanceGroup: BalanceGroupEntity,
+    var balanceGroup: BalanceGroupEntity,
 
     @Enumerated(EnumType.STRING)
-    val splitType: ExpenseSplitType,
-)
+    var splitType: ExpenseSplitType,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ExpenseEntity
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
+}

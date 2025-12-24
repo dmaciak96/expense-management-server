@@ -21,7 +21,7 @@ import java.time.OffsetDateTime
 @Testcontainers
 @AutoConfigureRestTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class IntegrationTestSuite {
+abstract class IntegrationTest {
 
     @Autowired
     protected lateinit var restTestClient: RestTestClient
