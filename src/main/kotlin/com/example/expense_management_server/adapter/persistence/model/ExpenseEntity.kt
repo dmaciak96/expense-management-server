@@ -2,6 +2,7 @@ package com.example.expense_management_server.adapter.persistence.model
 
 import com.example.expense_management_server.domain.expense.model.ExpenseSplitType
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
@@ -12,10 +13,12 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Version
 import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.OffsetDateTime
 import java.util.UUID
 
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 class ExpenseEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,9 +28,7 @@ class ExpenseEntity(
     var version: Int? = null,
 
     @CreatedBy
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "created_by_id", nullable = false)
-    var createdBy: UserEntity? = null,
+    var createdById: UUID? = null,
 
     var createdAt: OffsetDateTime,
     var updatedAt: OffsetDateTime?,

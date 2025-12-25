@@ -11,6 +11,7 @@ import com.example.expense_management_server.domain.expense.exception.ExpenseNot
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
+import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -31,18 +32,24 @@ class BalanceGroupPersistenceAdapter(
         groupId: UUID,
         balanceGroupUpdatedData: BalanceGroupDomainModel
     ): BalanceGroupDomainModel {
-        val balanceGroupEntity = balanceGroupRepository.findById(groupId)
+        val currentData = balanceGroupRepository.findById(groupId)
             .orElseThrow { BalanceGroupNotFoundException(groupId) }
-        val currentDomainModel = map(balanceGroupEntity)
-        val savedBalanceGroup =
-            balanceGroupRepository.saveAndFlush(
-                map(
-                    currentDomainModel.copy(
-                        groupName = balanceGroupUpdatedData.groupName,
-                        groupMemberIds = balanceGroupUpdatedData.groupMemberIds
-                    ), balanceGroupEntity.version
-                )
-            )
+        val balanceGroupToUpdate = BalanceGroupEntity(
+            id = groupId,
+            version = currentData.version,
+            createdById = currentData.createdById,
+            createdAt = currentData.createdAt,
+            updatedAt = OffsetDateTime.now(),
+            groupName = balanceGroupUpdatedData.groupName,
+            groupMembers = (balanceGroupUpdatedData.groupMemberIds + balanceGroupUpdatedData.groupOwnerUserId)
+                .map {
+                    userRepository.findById(it)
+                        .orElseThrow { UserNotFoundException() }
+                }
+                .toSet(),
+            expenses = currentData.expenses,
+        )
+        val savedBalanceGroup = balanceGroupRepository.saveAndFlush(balanceGroupToUpdate)
         LOGGER.info { "Balance group ${savedBalanceGroup.id} was successfully updated" }
         return map(savedBalanceGroup)
     }
@@ -75,7 +82,7 @@ class BalanceGroupPersistenceAdapter(
             createdAt = balanceGroupDomainModel.createdAt,
             updatedAt = balanceGroupDomainModel.updatedAt,
             groupName = balanceGroupDomainModel.groupName,
-            groupMembers = balanceGroupDomainModel.groupMemberIds
+            groupMembers = (balanceGroupDomainModel.groupMemberIds + balanceGroupDomainModel.groupOwnerUserId)
                 .map {
                     userRepository.findById(it)
                         .orElseThrow { UserNotFoundException() }
@@ -96,7 +103,7 @@ class BalanceGroupPersistenceAdapter(
                 .map { it.id!! },
             expenseIds = balanceGroupEntity.expenses
                 .map { it.id!! },
-            groupOwnerUserId = balanceGroupEntity.createdBy!!.id!!,
+            groupOwnerUserId = balanceGroupEntity.createdById!!,
             createdAt = balanceGroupEntity.createdAt,
             updatedAt = balanceGroupEntity.updatedAt
         )

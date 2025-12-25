@@ -8,7 +8,6 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.Version
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -35,9 +34,6 @@ class UserEntity(
 
     @Version
     var version: Int? = null,
-
-    @ManyToMany(mappedBy = "groupMembers")
-    var balanceGroups: Set<BalanceGroupEntity> = emptySet(),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

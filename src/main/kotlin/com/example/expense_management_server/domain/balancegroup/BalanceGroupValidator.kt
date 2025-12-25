@@ -1,5 +1,6 @@
 package com.example.expense_management_server.domain.balancegroup
 
+import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
 import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
 import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
 import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
@@ -19,7 +20,6 @@ class BalanceGroupValidator(
     fun validate(balanceGroup: BalanceGroupDomainModel) {
         checkIfOwnerExists(balanceGroup.groupOwnerUserId)
         checkIfNameIsBlank(balanceGroup.groupName)
-        checkIfGroupOwnerIsMember(balanceGroup.groupOwnerUserId, balanceGroup.groupMemberIds)
         checkIfAllMembersExists(balanceGroup.groupMemberIds)
         checkIfAllExpensesExists(balanceGroup.expenseIds)
     }
@@ -30,9 +30,8 @@ class BalanceGroupValidator(
     }
 
     fun getIfBalanceGroupExists(balanceGroupId: UUID): BalanceGroupDomainModel {
-        val balanceGroup = balanceGroupPersistencePort.getById(balanceGroupId) ?: throw BalanceGroupValidationException(
-            "Balance group not found"
-        )
+        val balanceGroup =
+            balanceGroupPersistencePort.getById(balanceGroupId) ?: throw BalanceGroupNotFoundException(balanceGroupId)
         return balanceGroup
     }
 
@@ -59,14 +58,6 @@ class BalanceGroupValidator(
             throw BalanceGroupValidationException("Balance group name cannot contains whitespaces only")
         }
         LOGGER.debug { "Balance group name ($name) is valid" }
-    }
-
-    private fun checkIfGroupOwnerIsMember(ownerId: UUID, membersIds: List<UUID>) {
-        if (!membersIds.contains(ownerId)) {
-            LOGGER.debug { "Balance group creator is not a group member" }
-            throw BalanceGroupValidationException("Balance group creator must be a group member")
-        }
-        LOGGER.debug { "Balance group members is valid" }
     }
 
     private fun checkIfOwnerExists(ownerId: UUID) {

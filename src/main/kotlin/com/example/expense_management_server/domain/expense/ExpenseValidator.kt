@@ -1,6 +1,7 @@
 package com.example.expense_management_server.domain.expense
 
 import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
 import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
@@ -35,7 +36,7 @@ class ExpenseValidator(
     fun checkIfExpenseExists(expenseId: UUID) {
         if (expensePersistencePort.getById(expenseId) == null) {
             LOGGER.debug { "Expense $expenseId not found" }
-            throw ExpenseValidationException("Expense not found")
+            throw ExpenseNotFoundException(expenseId)
         }
         LOGGER.debug { "Expense $expenseId exists" }
     }

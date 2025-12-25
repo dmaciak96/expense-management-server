@@ -3,6 +3,7 @@ package com.example.expense_management_server.unit.domain.expense
 import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
 import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.ExpenseValidator
+import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
 import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
 import com.example.expense_management_server.domain.expense.model.ExpenseSplitType
@@ -146,15 +147,15 @@ class ExpenseValidatorTest {
     }
 
     @Test
-    fun `should throw ExpenseValidationException when expense does not exist`() {
+    fun `should throw ExpenseNotFoundException when expense does not exist`() {
         // given
         whenever(expensePersistencePort.getById(EXPENSE_ID)).thenReturn(null)
 
         // when & then
-        val ex = assertThrows<ExpenseValidationException> {
+        val ex = assertThrows<ExpenseNotFoundException> {
             expenseValidator.checkIfExpenseExists(EXPENSE_ID)
         }
-        assertThat(ex.message).isEqualTo("Expense not found")
+        assertThat(ex.message).isEqualTo("Expense $EXPENSE_ID not found")
 
         verify(expensePersistencePort).getById(EXPENSE_ID)
         verifyNoMoreInteractions(expensePersistencePort, balanceGroupPersistencePort)

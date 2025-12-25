@@ -5,31 +5,27 @@ import com.example.expense_management_server.adapter.security.model.UserAccount
 import com.example.expense_management_server.domain.facade.IBalanceGroupManagementFacade
 import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
-import com.example.expense_management_server.domain.user.model.UserDomainModel
 import com.example.expense_management_server.domain.user.model.UserRole
 import com.example.expense_management_server.domain.user.port.ISecurityPort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
 import java.util.UUID
 
 
 @Component
 class SpringSecurityAdapter(
-    private val userPersistencePort: IUserPersistencePort,
     private val balanceGroupFacade: IBalanceGroupManagementFacade,
-    private val expenseFacade: IExpenseManagementFacade
+    private val expenseFacade: IExpenseManagementFacade,
 ) : ISecurityPort {
 
-    override fun getCurrentLoginUser(): UserDomainModel {
+    override fun getCurrentLoginUserId(): UUID {
         val securityContext = SecurityContextHolder.getContext()
-        val authentication = securityContext.authentication
-        if (authentication == null || !authentication.isAuthenticated) {
+        val authentication = securityContext.authentication ?: throw UserNotFoundException()
+        if (!authentication.isAuthenticated) {
             throw UserNotAuthenticatedException()
         }
-        val userDetails = authentication.principal as UserDetails
-        return userPersistencePort.findUserAccountByEmail(userDetails.username) ?: throw UserNotFoundException()
+        val userDetails = authentication.principal as UserAccount
+        return userDetails.id
     }
 
     override fun isAdmin(): Boolean {

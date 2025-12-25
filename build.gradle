@@ -65,6 +65,8 @@ allOpen {
     annotation 'jakarta.persistence.Embeddable'
 }
 
-tasks.named('test') {
+tasks.test  {
     useJUnitPlatform()
+    maxParallelForks = 1
+    forkEvery = 0
 }
