@@ -14,14 +14,12 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.client.RestTestClient
 import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.OffsetDateTime
 
-@Testcontainers
+//@Testcontainers
 @AutoConfigureRestTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class IntegrationTestSuite {
+abstract class IntegrationTest {
 
     @Autowired
     protected lateinit var restTestClient: RestTestClient
@@ -63,6 +61,21 @@ abstract class IntegrationTestSuite {
                 accountStatus = AccountStatus.ACTIVE,
             )
         )
+
+        userRepository.save(
+            UserEntity(
+                id = null,
+                email = ADDITIONAL_USER_EMAIL,
+                nickname = null,
+                passwordHash = passwordEncoder.encode(ADDITIONAL_USER_PASSWORD)!!,
+                isEmailVerified = false,
+                createdAt = OffsetDateTime.now(),
+                updatedAt = null,
+                lastLoginAt = null,
+                role = UserRole.USER,
+                accountStatus = AccountStatus.ACTIVE,
+            )
+        )
     }
 
     @AfterEach
@@ -71,22 +84,28 @@ abstract class IntegrationTestSuite {
     }
 
     companion object {
-
         @JvmStatic
         @DynamicPropertySource
         fun configureDatabaseProperties(registry: DynamicPropertyRegistry) {
-            registry.add("spring.datasource.url") { postgres.getJdbcUrl() }
-            registry.add("spring.datasource.username") { postgres.username }
-            registry.add("spring.datasource.password") { postgres.password }
+            registry.add("spring.datasource.url") { PostgresTestContainer.jdbcUrl }
+            registry.add("spring.datasource.username") { PostgresTestContainer.username }
+            registry.add("spring.datasource.password") { PostgresTestContainer.password }
         }
-
-        @Container
-        @JvmStatic
-        val postgres = PostgreSQLContainer("postgres:18.1-alpine")
 
         protected const val STANDARD_USER_EMAIL = "standard-user@test.com"
         protected const val STANDARD_PASSWORD = "standard-user@tesTcom123"
         protected const val ADMIN_USER_EMAIL = "admin-user@test.com"
+        protected const val ADDITIONAL_USER_EMAIL = "additional-user@email.com"
+        protected const val ADDITIONAL_USER_PASSWORD = "test-password"
         protected const val ADMIN_PASSWORD = "admin-user@tesTcom123"
+    }
+}
+
+object PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgres:16-alpine") {
+    init {
+        withDatabaseName("test")
+        withUsername("test")
+        withPassword("test")
+        start()
     }
 }

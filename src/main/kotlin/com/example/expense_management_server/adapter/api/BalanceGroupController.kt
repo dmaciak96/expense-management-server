@@ -50,10 +50,9 @@ class BalanceGroupController(
     }
 
     @GetMapping
-    @PreAuthorize(IS_GROUP_MEMBER_OR_ADMIN_MATCHER)
     fun getAllWhereUserIsMember(): List<BalanceGroupResponse> {
         LOGGER.info { "HTTP request received: fetch Balance groups" }
-        return balanceGroupFacade.getAllWhereUserIsGroupMember(securityPort.getCurrentLoginUser().id!!)
+        return balanceGroupFacade.getAllWhereUserIsGroupMember(securityPort.getCurrentLoginUserId())
             .map { BalanceGroupResponse.from(it) }
     }
 
@@ -119,7 +118,7 @@ class BalanceGroupController(
         if (expenseDomainModel.balanceGroupId != balanceGroupId) {
             throw ExpenseNotFoundException(expenseId)
         }
-        expenseFacade.delete(balanceGroupId)
+        expenseFacade.delete(expenseId)
     }
 
     @PostMapping(
@@ -154,7 +153,7 @@ class BalanceGroupController(
             groupName = balanceGroupRequest.groupName,
             groupMemberIds = balanceGroupRequest.groupMemberIds,
             expenseIds = emptyList(),
-            groupOwnerUserId = securityPort.getCurrentLoginUser().id!!,
+            groupOwnerUserId = securityPort.getCurrentLoginUserId(),
             createdAt = OffsetDateTime.now(),
             updatedAt = null
         )
@@ -163,7 +162,7 @@ class BalanceGroupController(
         id = null,
         name = expenseRequest.name,
         balanceGroupId = balanceGroupId,
-        expenseOwnerId = securityPort.getCurrentLoginUser().id!!,
+        expenseOwnerId = securityPort.getCurrentLoginUserId(),
         amount = expenseRequest.amount,
         splitType = expenseRequest.splitType,
         createdAt = OffsetDateTime.now(),

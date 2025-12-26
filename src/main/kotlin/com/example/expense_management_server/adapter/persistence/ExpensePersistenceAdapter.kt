@@ -82,7 +82,7 @@ class ExpensePersistenceAdapter(
             splitType = expenseEntity.splitType,
             createdAt = expenseEntity.createdAt,
             updatedAt = expenseEntity.updatedAt,
-            expenseOwnerId = expenseEntity.createdBy?.id!!
+            expenseOwnerId = expenseEntity.createdById!!
         )
     }
 

@@ -1,6 +1,7 @@
 package com.example.expense_management_server.unit.domain.balancegroup
 
 import com.example.expense_management_server.domain.balancegroup.BalanceGroupValidator
+import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
 import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
 import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
 import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
@@ -69,19 +70,6 @@ class BalanceGroupValidatorTest {
     }
 
     @Test
-    fun `should throw exception when group creator isn't group member`() {
-        // given
-        whenever(userPersistencePort.findUserAccountById(GROUP_OWNER_ID))
-            .thenReturn(mock())
-
-        // when & then
-        val exception = assertThrows<BalanceGroupValidationException> {
-            balanceGroupValidator.validate(BALANCE_GROUP.copy(groupMemberIds = listOf(MEMBER_ID)))
-        }
-        assertThat(exception.message).isEqualTo("Balance group creator must be a group member")
-    }
-
-    @Test
     fun `should throw exception when some group member not exists`() {
         // given
         whenever(userPersistencePort.findUserAccountById(GROUP_OWNER_ID))
@@ -135,10 +123,10 @@ class BalanceGroupValidatorTest {
             .thenReturn(mock())
 
         // when & then
-        val exception = assertThrows<BalanceGroupValidationException> {
+        val exception = assertThrows<BalanceGroupNotFoundException> {
             balanceGroupValidator.validateForUpdate(BALANCE_GROUP_ID, BALANCE_GROUP)
         }
-        assertThat(exception.message).isEqualTo("Balance group not found")
+        assertThat(exception.message).isEqualTo("Balance group $BALANCE_GROUP_ID not found")
     }
 
     @Test

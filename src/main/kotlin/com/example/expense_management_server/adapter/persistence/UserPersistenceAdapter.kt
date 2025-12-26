@@ -2,9 +2,9 @@ package com.example.expense_management_server.adapter.persistence
 
 import com.example.expense_management_server.adapter.persistence.model.UserEntity
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.UserDomainModel
+import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.UUID

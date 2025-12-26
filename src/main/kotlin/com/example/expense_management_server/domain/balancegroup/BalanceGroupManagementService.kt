@@ -1,6 +1,5 @@
 package com.example.expense_management_server.domain.balancegroup
 
-import com.example.expense_management_server.adapter.api.model.BalanceGroupRequest
 import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
 import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
 import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
