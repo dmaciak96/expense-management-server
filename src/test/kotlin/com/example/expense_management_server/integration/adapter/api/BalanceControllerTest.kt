@@ -25,7 +25,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.test.Test
 
-class BalanceGroupControllerTest : IntegrationTest() {
+class BalanceControllerTest : IntegrationTest() {
 
     @Autowired
     private lateinit var balanceGroupRepository: BalanceGroupRepository
@@ -135,6 +135,7 @@ class BalanceGroupControllerTest : IntegrationTest() {
                 assertThat(responseBody.groupMemberIds).containsOnly(standardUserId)
                 assertThat(responseBody.createdAt).isNotNull()
                 assertThat(responseBody.updatedAt).isNull()
+                assertThat(responseBody.currentUserBalance).isEqualTo(0.0)
             }
     }
 
@@ -180,6 +181,7 @@ class BalanceGroupControllerTest : IntegrationTest() {
                 assertThat(responseBody.groupMemberIds).contains(standardUserId, additionalUserId)
                 assertThat(responseBody.createdAt).isNotNull()
                 assertThat(responseBody.updatedAt).isNotNull()
+                assertThat(responseBody.currentUserBalance).isEqualTo(25.0)
             }
     }
 
@@ -240,6 +242,7 @@ class BalanceGroupControllerTest : IntegrationTest() {
                 assertThat(responseBody.groupMemberIds).containsOnly(standardUserId, additionalUserId)
                 assertThat(responseBody.createdAt).isNotNull()
                 assertThat(responseBody.updatedAt).isNull()
+                assertThat(responseBody.currentUserBalance).isEqualTo(-25.0)
             }
     }
 
@@ -480,6 +483,7 @@ class BalanceGroupControllerTest : IntegrationTest() {
                 assertThat(responseBody.groupMemberIds).containsOnly(adminUserId)
                 assertThat(responseBody.createdAt).isNotNull()
                 assertThat(responseBody.updatedAt).isNull()
+                assertThat(responseBody.currentUserBalance).isEqualTo(0.0)
             }
     }
 
@@ -509,6 +513,7 @@ class BalanceGroupControllerTest : IntegrationTest() {
                 assertThat(responseBody.groupName).isEqualTo(GROUP_NAME)
                 assertThat(responseBody.groupMemberIds).containsOnly(standardUserId, additionalUserId)
                 assertThat(responseBody.createdAt).isNotNull()
+                assertThat(responseBody.currentUserBalance).isEqualTo(-75.0)
             }
     }
 

@@ -46,14 +46,18 @@ class BalanceGroupController(
     fun getById(@PathVariable balanceGroupId: UUID): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: fetch balance group by id $balanceGroupId " }
         val balanceGroup = balanceGroupFacade.getById(balanceGroupId)
-        return BalanceGroupResponse.from(balanceGroup)
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     @GetMapping
     fun getAllWhereUserIsMember(): List<BalanceGroupResponse> {
         LOGGER.info { "HTTP request received: fetch Balance groups" }
         return balanceGroupFacade.getAllWhereUserIsGroupMember(securityPort.getCurrentLoginUserId())
-            .map { BalanceGroupResponse.from(it) }
+            .map {
+                val balance = balanceGroupFacade.calculateBalance(it.id!!, securityPort.getCurrentLoginUserId())
+                BalanceGroupResponse.from(it, balance)
+            }
     }
 
     @DeleteMapping("/{balanceGroupId}")
@@ -68,8 +72,9 @@ class BalanceGroupController(
     @ResponseStatus(HttpStatus.CREATED)
     fun save(@RequestBody balanceGroupRequest: BalanceGroupRequest): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: creating new balance group ${balanceGroupRequest.groupName}" }
-        val savedBalanceGroup = balanceGroupFacade.save(mapBalanceGroup(balanceGroupRequest))
-        return BalanceGroupResponse.from(savedBalanceGroup)
+        val balanceGroup = balanceGroupFacade.save(mapBalanceGroup(balanceGroupRequest))
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     @PutMapping("/{balanceGroupId}")
@@ -79,8 +84,9 @@ class BalanceGroupController(
         @RequestBody balanceGroupRequest: BalanceGroupRequest
     ): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: updating balance group $balanceGroupId" }
-        val updatedBalanceGroup = balanceGroupFacade.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
-        return BalanceGroupResponse.from(updatedBalanceGroup)
+        val balanceGroup = balanceGroupFacade.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     // --------------------------------EXPENSES--------------------------------

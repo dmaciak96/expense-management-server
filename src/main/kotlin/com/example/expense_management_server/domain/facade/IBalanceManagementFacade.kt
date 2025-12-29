@@ -9,4 +9,5 @@ interface IBalanceManagementFacade {
     fun delete(balanceGroupId: UUID)
     fun getById(balanceGroupId: UUID): BalanceGroup
     fun getAllWhereUserIsGroupMember(userId: UUID): List<BalanceGroup>
+    fun calculateBalance(balanceGroupId: UUID, userId: UUID): Double
 }

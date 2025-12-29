@@ -1,4 +1,4 @@
-package com.example.expense_management_server.unit.domain.balancegroup
+package com.example.expense_management_server.unit.domain.balance
 
 import com.example.expense_management_server.domain.balance.BalanceGroupValidator
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
