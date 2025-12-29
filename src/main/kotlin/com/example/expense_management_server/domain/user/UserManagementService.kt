@@ -6,8 +6,8 @@ import com.example.expense_management_server.domain.user.exception.PasswordValid
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.AccountStatus
-import com.example.expense_management_server.domain.user.model.UserDomainModel
-import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
+import com.example.expense_management_server.domain.user.model.UserHttpModel
+import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
 import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
 import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
@@ -27,22 +27,22 @@ class UserManagementService(
     private val clock: Clock,
 ) : IUserManagementFacade {
 
-    override fun registerNewUser(userRegistrationModel: UserHttpDomainModel): UserDomainModel {
+    override fun registerNewUser(userHttpModel: UserHttpModel): UserModel {
         LOGGER.info { "Registering new user account" }
-        checkIfEmailAlreadyExists(userRegistrationModel.email)
+        checkIfEmailAlreadyExists(userHttpModel.email)
 
-        validatePassword(userRegistrationModel.password)
+        validatePassword(userHttpModel.password)
         LOGGER.info { "Password validation finished" }
 
-        val passwordHash = passwordEncoderPort.encodePassword(userRegistrationModel.password)
+        val passwordHash = passwordEncoderPort.encodePassword(userHttpModel.password)
         LOGGER.debug { "Password encoded successfully" }
 
-        checkIfNicknameIsEmpty(userRegistrationModel.nickname)
+        checkIfNicknameIsEmpty(userHttpModel.nickname)
         val savedUserAccount = userPersistencePort.saveOrUpdateUserAccount(
-            UserDomainModel(
+            UserModel(
                 id = null,
-                email = userRegistrationModel.email,
-                nickname = userRegistrationModel.nickname,
+                email = userHttpModel.email,
+                nickname = userHttpModel.nickname,
                 passwordHash = passwordHash,
                 role = UserRole.USER,
                 isEmailVerified = false,
@@ -61,13 +61,13 @@ class UserManagementService(
         return savedUserAccount
     }
 
-    override fun getUserById(id: UUID): UserDomainModel {
+    override fun getUserById(id: UUID): UserModel {
         LOGGER.info { "Fetching registered user by id" }
         val user = userPersistencePort.findUserAccountById(id) ?: throw UserNotFoundException()
         return user
     }
 
-    override fun getUserByEmail(email: String): UserDomainModel {
+    override fun getUserByEmail(email: String): UserModel {
         LOGGER.info { "Fetching registered user by email: $email" }
         val user = userPersistencePort.findUserAccountByEmail(email) ?: throw UserNotFoundException()
         return user
@@ -75,42 +75,42 @@ class UserManagementService(
 
     override fun updateUser(
         userId: UUID,
-        userUpdateModel: UserHttpDomainModel
-    ): UserDomainModel {
+        userHttpModel: UserHttpModel
+    ): UserModel {
         LOGGER.info { "Updating user account $userId" }
         val targetUserAccount = userPersistencePort.findUserAccountById(userId) ?: throw UserNotFoundException()
-        if (userUpdateModel.email != targetUserAccount.email) {
-            LOGGER.info { "Checking if account with specified email ${userUpdateModel.email} already exists" }
-            checkIfEmailAlreadyExists(userUpdateModel.email)
+        if (userHttpModel.email != targetUserAccount.email) {
+            LOGGER.info { "Checking if account with specified email ${userHttpModel.email} already exists" }
+            checkIfEmailAlreadyExists(userHttpModel.email)
         }
-        validatePassword(userUpdateModel.password)
+        validatePassword(userHttpModel.password)
         LOGGER.info { "Password validation finished" }
 
-        val passwordHash = passwordEncoderPort.encodePassword(userUpdateModel.password)
+        val passwordHash = passwordEncoderPort.encodePassword(userHttpModel.password)
         LOGGER.debug { "Password encoded successfully" }
 
-        checkIfNicknameIsEmpty(userUpdateModel.nickname)
+        checkIfNicknameIsEmpty(userHttpModel.nickname)
 
-        val email = if (targetUserAccount.email == userUpdateModel.email) {
+        val email = if (targetUserAccount.email == userHttpModel.email) {
             targetUserAccount.email
         } else {
-            userUpdateModel.email
+            userHttpModel.email
         }
 
-        val nickname = if (targetUserAccount.nickname == userUpdateModel.nickname) {
+        val nickname = if (targetUserAccount.nickname == userHttpModel.nickname) {
             targetUserAccount.nickname
         } else {
-            userUpdateModel.nickname
+            userHttpModel.nickname
         }
 
-        val isEmailVerified = if (targetUserAccount.email == userUpdateModel.email) {
+        val isEmailVerified = if (targetUserAccount.email == userHttpModel.email) {
             targetUserAccount.isEmailVerified
         } else {
             false
         }
 
         val savedUserAccount = userPersistencePort.saveOrUpdateUserAccount(
-            UserDomainModel(
+            UserModel(
                 id = userId,
                 email = email,
                 nickname = nickname,
@@ -125,7 +125,7 @@ class UserManagementService(
         )
         LOGGER.info { "User account $userId was updated successfully" }
 
-        if (targetUserAccount.email != userUpdateModel.email) {
+        if (targetUserAccount.email != userHttpModel.email) {
             LOGGER.info { "Sending verification e-mail to ${savedUserAccount.email}" }
             emailVerificationPort.sendEmailVerificationMessage(savedUserAccount.email)
             LOGGER.info { "Verification e-mail was sent to ${savedUserAccount.email}" }

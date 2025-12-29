@@ -2,7 +2,7 @@ package com.example.expense_management_server.adapter.security
 
 import com.example.expense_management_server.adapter.security.exception.UserNotAuthenticatedException
 import com.example.expense_management_server.adapter.security.model.UserAccount
-import com.example.expense_management_server.domain.facade.IBalanceGroupManagementFacade
+import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
 import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.UserRole
@@ -14,7 +14,7 @@ import java.util.UUID
 
 @Component
 class SpringSecurityAdapter(
-    private val balanceGroupFacade: IBalanceGroupManagementFacade,
+    private val balanceGroupFacade: IBalanceManagementFacade,
     private val expenseFacade: IExpenseManagementFacade,
 ) : ISecurityPort {
 

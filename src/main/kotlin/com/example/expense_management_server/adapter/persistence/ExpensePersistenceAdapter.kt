@@ -3,10 +3,10 @@ package com.example.expense_management_server.adapter.persistence
 import com.example.expense_management_server.adapter.persistence.model.ExpenseEntity
 import com.example.expense_management_server.adapter.persistence.repository.BalanceGroupRepository
 import com.example.expense_management_server.adapter.persistence.repository.ExpenseRepository
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
@@ -19,37 +19,37 @@ class ExpensePersistenceAdapter(
     private val balanceGroupRepository: BalanceGroupRepository
 ) : IExpensePersistencePort {
 
-    override fun save(expenseData: ExpenseDomainModel): ExpenseDomainModel {
-        val savedExpense = expenseRepository.save(map(expenseData))
-        LOGGER.info { "New expense ${savedExpense.id} was successfully saved in database" }
-        return map(savedExpense)
+    override fun save(expense: Expense): Expense {
+        val savedEntity = expenseRepository.save(map(expense))
+        LOGGER.info { "New expense ${savedEntity.id} was successfully saved in database" }
+        return map(savedEntity)
     }
 
     override fun update(
         expenseId: UUID,
-        expenseUpdatedData: ExpenseDomainModel
-    ): ExpenseDomainModel {
-        val expense = expenseRepository.findById(expenseId)
+        expense: Expense
+    ): Expense {
+        val targetEntity = expenseRepository.findById(expenseId)
             .orElseThrow { ExpenseNotFoundException(expenseId) }
 
-        val savedExpense =
+        val updatedEntity =
             expenseRepository.saveAndFlush(
                 map(
-                    expenseUpdatedData.copy(id = expenseId, createdAt = expense.createdAt),
-                    expense.version
+                    expense.copy(id = expenseId, createdAt = targetEntity.createdAt),
+                    targetEntity.version
                 )
             )
-        LOGGER.info { "Expense ${savedExpense.id} was successfully updated" }
-        return map(savedExpense)
+        LOGGER.info { "Expense ${updatedEntity.id} was successfully updated" }
+        return map(updatedEntity)
     }
 
-    override fun getById(expenseId: UUID): ExpenseDomainModel? {
+    override fun getById(expenseId: UUID): Expense? {
         return expenseRepository.findById(expenseId)
             .map { map(it) }
             .getOrNull()
     }
 
-    override fun getAllByBalanceGroup(balanceGroupId: UUID): List<ExpenseDomainModel> {
+    override fun getAllByBalanceGroup(balanceGroupId: UUID): List<Expense> {
         val expenses = balanceGroupRepository.findById(balanceGroupId)
             .map { it.expenses }
             .orElseThrow { BalanceGroupNotFoundException(balanceGroupId) }
@@ -61,20 +61,20 @@ class ExpensePersistenceAdapter(
         LOGGER.info { "Expense $expenseId was removed" }
     }
 
-    private fun map(expenseDomainModel: ExpenseDomainModel, version: Int? = null): ExpenseEntity = ExpenseEntity(
-        id = expenseDomainModel.id,
+    private fun map(expense: Expense, version: Int? = null): ExpenseEntity = ExpenseEntity(
+        id = expense.id,
         version = version,
-        createdAt = expenseDomainModel.createdAt,
-        updatedAt = expenseDomainModel.updatedAt,
-        name = expenseDomainModel.name,
-        amount = expenseDomainModel.amount,
-        balanceGroup = balanceGroupRepository.findById(expenseDomainModel.balanceGroupId)
+        createdAt = expense.createdAt,
+        updatedAt = expense.updatedAt,
+        name = expense.name,
+        amount = expense.amount,
+        balanceGroup = balanceGroupRepository.findById(expense.balanceGroupId)
             .orElseThrow { ExpenseValidationException(message = "Balance group not found") },
-        splitType = expenseDomainModel.splitType,
+        splitType = expense.splitType,
     )
 
-    private fun map(expenseEntity: ExpenseEntity): ExpenseDomainModel {
-        return ExpenseDomainModel(
+    private fun map(expenseEntity: ExpenseEntity): Expense {
+        return Expense(
             id = expenseEntity.id,
             name = expenseEntity.name,
             balanceGroupId = expenseEntity.balanceGroup.id!!,

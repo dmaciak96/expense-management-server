@@ -4,9 +4,9 @@ import com.example.expense_management_server.adapter.persistence.model.BalanceGr
 import com.example.expense_management_server.adapter.persistence.repository.BalanceGroupRepository
 import com.example.expense_management_server.adapter.persistence.repository.ExpenseRepository
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -22,81 +22,82 @@ class BalanceGroupPersistenceAdapter(
     private val expenseRepository: ExpenseRepository,
 ) : IBalanceGroupPersistencePort {
 
-    override fun save(balanceGroupData: BalanceGroupDomainModel): BalanceGroupDomainModel {
-        val savedBalanceGroup = balanceGroupRepository.save(map(balanceGroupData))
-        LOGGER.info { "New balance group ${savedBalanceGroup.id} was successfully saved in database" }
-        return map(savedBalanceGroup)
+    override fun save(balanceGroup: BalanceGroup): BalanceGroup {
+        val balanceGroupEntity = balanceGroupRepository.save(mapToModel(balanceGroup))
+        LOGGER.info { "New balance group ${balanceGroupEntity.id} was successfully saved in database" }
+        return mapToModel(balanceGroupEntity)
     }
 
     override fun update(
-        groupId: UUID,
-        balanceGroupUpdatedData: BalanceGroupDomainModel
-    ): BalanceGroupDomainModel {
-        val currentData = balanceGroupRepository.findById(groupId)
-            .orElseThrow { BalanceGroupNotFoundException(groupId) }
-        val balanceGroupToUpdate = BalanceGroupEntity(
-            id = groupId,
-            version = currentData.version,
-            createdById = currentData.createdById,
-            createdAt = currentData.createdAt,
+        balanceGroupId: UUID,
+        balanceGroup: BalanceGroup
+    ): BalanceGroup {
+        val targetEntity = balanceGroupRepository.findById(balanceGroupId)
+            .orElseThrow { BalanceGroupNotFoundException(balanceGroupId) }
+
+        val sourceEntity = BalanceGroupEntity(
+            id = balanceGroupId,
+            version = targetEntity.version,
+            createdById = targetEntity.createdById,
+            createdAt = targetEntity.createdAt,
             updatedAt = OffsetDateTime.now(),
-            groupName = balanceGroupUpdatedData.groupName,
-            groupMembers = (balanceGroupUpdatedData.groupMemberIds + balanceGroupUpdatedData.groupOwnerUserId)
+            groupName = balanceGroup.groupName,
+            groupMembers = (balanceGroup.groupMemberIds + balanceGroup.groupOwnerUserId)
                 .map {
                     userRepository.findById(it)
                         .orElseThrow { UserNotFoundException() }
                 }
                 .toSet(),
-            expenses = currentData.expenses,
+            expenses = targetEntity.expenses,
         )
-        val savedBalanceGroup = balanceGroupRepository.saveAndFlush(balanceGroupToUpdate)
-        LOGGER.info { "Balance group ${savedBalanceGroup.id} was successfully updated" }
-        return map(savedBalanceGroup)
+        val savedEntity = balanceGroupRepository.saveAndFlush(sourceEntity)
+        LOGGER.info { "Balance group ${savedEntity.id} was successfully updated" }
+        return mapToModel(savedEntity)
     }
 
-    override fun getById(groupId: UUID): BalanceGroupDomainModel? {
-        return balanceGroupRepository.findById(groupId)
-            .map { map(it) }
+    override fun getById(balanceGroupId: UUID): BalanceGroup? {
+        return balanceGroupRepository.findById(balanceGroupId)
+            .map { mapToModel(it) }
             .getOrNull()
     }
 
-    override fun getAll(): List<BalanceGroupDomainModel> {
+    override fun getAll(): List<BalanceGroup> {
         return balanceGroupRepository.findAll()
-            .map { map(it) }
+            .map { mapToModel(it) }
     }
 
-    override fun getAllWhereUserIsGroupMember(userMemberId: UUID): List<BalanceGroupDomainModel> {
-        return balanceGroupRepository.findAllByGroupMembersId(userMemberId)
-            .map { map(it) }
+    override fun getAllWhereUserIsGroupMember(balanceGroupMemberId: UUID): List<BalanceGroup> {
+        return balanceGroupRepository.findAllByGroupMembersId(balanceGroupMemberId)
+            .map { mapToModel(it) }
     }
 
-    override fun delete(groupId: UUID) {
-        balanceGroupRepository.deleteById(groupId)
-        LOGGER.info { "Balance group $groupId was removed" }
+    override fun delete(balanceGroupId: UUID) {
+        balanceGroupRepository.deleteById(balanceGroupId)
+        LOGGER.info { "Balance group $balanceGroupId was removed" }
     }
 
-    private fun map(balanceGroupDomainModel: BalanceGroupDomainModel, version: Int? = null): BalanceGroupEntity =
+    private fun mapToModel(balanceGroup: BalanceGroup, version: Int? = null): BalanceGroupEntity =
         BalanceGroupEntity(
-            id = balanceGroupDomainModel.id,
+            id = balanceGroup.id,
             version = version,
-            createdAt = balanceGroupDomainModel.createdAt,
-            updatedAt = balanceGroupDomainModel.updatedAt,
-            groupName = balanceGroupDomainModel.groupName,
-            groupMembers = (balanceGroupDomainModel.groupMemberIds + balanceGroupDomainModel.groupOwnerUserId)
+            createdAt = balanceGroup.createdAt,
+            updatedAt = balanceGroup.updatedAt,
+            groupName = balanceGroup.groupName,
+            groupMembers = (balanceGroup.groupMemberIds + balanceGroup.groupOwnerUserId)
                 .map {
                     userRepository.findById(it)
                         .orElseThrow { UserNotFoundException() }
                 }
                 .toSet(),
-            expenses = balanceGroupDomainModel.expenseIds
+            expenses = balanceGroup.expenseIds
                 .map {
                     expenseRepository.findById(it)
                         .orElseThrow { ExpenseNotFoundException(UUID.randomUUID()) }
                 }
         )
 
-    private fun map(balanceGroupEntity: BalanceGroupEntity): BalanceGroupDomainModel =
-        BalanceGroupDomainModel(
+    private fun mapToModel(balanceGroupEntity: BalanceGroupEntity): BalanceGroup =
+        BalanceGroup(
             id = balanceGroupEntity.id,
             groupName = balanceGroupEntity.groupName,
             groupMemberIds = balanceGroupEntity.groupMembers

@@ -3,7 +3,7 @@ package com.example.expense_management_server.domain.user.model
 import java.time.OffsetDateTime
 import java.util.UUID
 
-data class UserDomainModel(
+data class UserModel(
     val id: UUID?,
     val email: String,
     val nickname: String?,
@@ -16,7 +16,7 @@ data class UserDomainModel(
     val accountStatus: AccountStatus,
 )
 
-data class UserHttpDomainModel(
+data class UserHttpModel(
     val email: String,
     val password: String,
     val nickname: String?

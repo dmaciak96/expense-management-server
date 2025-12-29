@@ -4,13 +4,13 @@ import com.example.expense_management_server.adapter.api.model.BalanceGroupReque
 import com.example.expense_management_server.adapter.api.model.BalanceGroupResponse
 import com.example.expense_management_server.adapter.api.model.ExpenseRequest
 import com.example.expense_management_server.adapter.api.model.ExpenseResponse
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
-import com.example.expense_management_server.domain.facade.IBalanceGroupManagementFacade
+import com.example.expense_management_server.domain.expense.model.Expense
+import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
 import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
 import com.example.expense_management_server.domain.user.port.ISecurityPort
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -36,7 +36,7 @@ import java.util.UUID
 @RestController
 @RequestMapping("/balance-groups")
 class BalanceGroupController(
-    private val balanceGroupFacade: IBalanceGroupManagementFacade,
+    private val balanceGroupFacade: IBalanceManagementFacade,
     private val expenseFacade: IExpenseManagementFacade,
     private val securityPort: ISecurityPort
 ) {
@@ -148,7 +148,7 @@ class BalanceGroupController(
     }
 
     private fun mapBalanceGroup(balanceGroupRequest: BalanceGroupRequest) =
-        BalanceGroupDomainModel(
+        BalanceGroup(
             id = null,
             groupName = balanceGroupRequest.groupName,
             groupMemberIds = balanceGroupRequest.groupMemberIds,
@@ -158,7 +158,7 @@ class BalanceGroupController(
             updatedAt = null
         )
 
-    private fun mapExpense(expenseRequest: ExpenseRequest, balanceGroupId: UUID) = ExpenseDomainModel(
+    private fun mapExpense(expenseRequest: ExpenseRequest, balanceGroupId: UUID) = Expense(
         id = null,
         name = expenseRequest.name,
         balanceGroupId = balanceGroupId,

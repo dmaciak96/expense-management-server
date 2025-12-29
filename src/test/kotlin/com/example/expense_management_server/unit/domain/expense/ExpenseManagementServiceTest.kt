@@ -2,7 +2,7 @@ package com.example.expense_management_server.unit.domain.expense
 
 import com.example.expense_management_server.domain.expense.ExpenseManagementService
 import com.example.expense_management_server.domain.expense.ExpenseValidator
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -188,7 +188,7 @@ class ExpenseManagementServiceTest {
         private val EXPENSE_ID = UUID.fromString("9e57d9dc-1c37-49f0-8c05-7e0ff7b3b5a8")
         private val BALANCE_GROUP_ID = UUID.fromString("f2bd2b1c-8fb6-4e65-a52e-4c4b9f9b2a0f")
 
-        private val EXPENSE_MODEL: ExpenseDomainModel = mock()
+        private val EXPENSE_MODEL: Expense = mock()
         private val EXPENSES = listOf(EXPENSE_MODEL)
     }
 }

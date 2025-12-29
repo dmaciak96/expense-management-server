@@ -1,40 +1,34 @@
-package com.example.expense_management_server.domain.balancegroup
+package com.example.expense_management_server.domain.balance
 
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
-import com.example.expense_management_server.domain.facade.IBalanceGroupManagementFacade
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class BalanceGroupManagementService(
+class BalanceManagementService(
     private val balanceGroupPersistencePort: IBalanceGroupPersistencePort,
     private val balanceGroupValidator: BalanceGroupValidator,
     private val userPersistencePort: IUserPersistencePort
-) : IBalanceGroupManagementFacade {
+) : IBalanceManagementFacade {
 
-    override fun save(balanceGroupDomainModel: BalanceGroupDomainModel): BalanceGroupDomainModel {
+    override fun save(balanceGroup: BalanceGroup): BalanceGroup {
         LOGGER.info { "Saving new balance group" }
-        balanceGroupValidator.validate(balanceGroupDomainModel)
-        return balanceGroupPersistencePort.save(balanceGroupData = balanceGroupDomainModel)
+        balanceGroupValidator.validate(balanceGroup)
+        return balanceGroupPersistencePort.save(balanceGroup)
     }
 
     override fun update(
         balanceGroupId: UUID,
-        balanceGroupDomainModel: BalanceGroupDomainModel
-    ): BalanceGroupDomainModel {
+        balanceGroup: BalanceGroup
+    ): BalanceGroup {
         LOGGER.info { "Updating balance group with id $balanceGroupId" }
-        balanceGroupValidator.validateForUpdate(
-            balanceGroupId = balanceGroupId,
-            balanceGroupUpdateData = balanceGroupDomainModel
-        )
-        return balanceGroupPersistencePort.update(
-            groupId = balanceGroupId,
-            balanceGroupUpdatedData = balanceGroupDomainModel
-        )
+        balanceGroupValidator.validateForUpdate(balanceGroupId, balanceGroup)
+        return balanceGroupPersistencePort.update(balanceGroupId, balanceGroup)
     }
 
     override fun delete(balanceGroupId: UUID) {
@@ -43,12 +37,12 @@ class BalanceGroupManagementService(
         balanceGroupPersistencePort.delete(balanceGroupId)
     }
 
-    override fun getById(balanceGroupId: UUID): BalanceGroupDomainModel {
+    override fun getById(balanceGroupId: UUID): BalanceGroup {
         LOGGER.info { "Fetching balance group with id $balanceGroupId" }
         return balanceGroupValidator.getIfBalanceGroupExists(balanceGroupId)
     }
 
-    override fun getAllWhereUserIsGroupMember(userId: UUID): List<BalanceGroupDomainModel> {
+    override fun getAllWhereUserIsGroupMember(userId: UUID): List<BalanceGroup> {
         userPersistencePort.findUserAccountById(userId)
             ?: throw BalanceGroupValidationException("User with id $userId does not exist")
         LOGGER.info { "Fetching balance groups where user $userId is a member" }

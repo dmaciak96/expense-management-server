@@ -1,9 +1,9 @@
-package com.example.expense_management_server.domain.balancegroup.model
+package com.example.expense_management_server.domain.balance.model
 
 import java.time.OffsetDateTime
 import java.util.UUID
 
-data class BalanceGroupDomainModel(
+data class BalanceGroup(
     val id: UUID?,
     val groupName: String,
     val groupMemberIds: List<UUID>,

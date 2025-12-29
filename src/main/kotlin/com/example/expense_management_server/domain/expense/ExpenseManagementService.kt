@@ -1,6 +1,6 @@
 package com.example.expense_management_server.domain.expense
 
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -13,27 +13,27 @@ class ExpenseManagementService(
     private val expenseValidator: ExpenseValidator,
 ) : IExpenseManagementFacade {
 
-    override fun save(expenseDomainModel: ExpenseDomainModel): ExpenseDomainModel {
-        LOGGER.info { "Saving expense $expenseDomainModel" }
+    override fun save(expense: Expense): Expense {
+        LOGGER.info { "Saving expense $expense" }
 
-        LOGGER.info { "Validating expense $expenseDomainModel" }
-        expenseValidator.validate(expenseDomainModel)
-        LOGGER.info { "Expense $expenseDomainModel is valid" }
+        LOGGER.info { "Validating expense $expense" }
+        expenseValidator.validate(expense)
+        LOGGER.info { "Expense $expense is valid" }
 
-        return expensePersistencePort.save(expenseDomainModel)
+        return expensePersistencePort.save(expense)
     }
 
     override fun update(
         expenseId: UUID,
-        expenseDomainModel: ExpenseDomainModel
-    ): ExpenseDomainModel {
+        expense: Expense
+    ): Expense {
         LOGGER.info { "Updating expense $expenseId" }
 
-        LOGGER.info { "Validating expense $expenseDomainModel" }
-        expenseValidator.validateForUpdate(expenseId, expenseDomainModel)
-        LOGGER.info { "Expense $expenseDomainModel is valid" }
+        LOGGER.info { "Validating expense $expense" }
+        expenseValidator.validateForUpdate(expenseId, expense)
+        LOGGER.info { "Expense $expense is valid" }
 
-        return expensePersistencePort.update(expenseId, expenseDomainModel)
+        return expensePersistencePort.update(expenseId, expense)
     }
 
     override fun delete(expenseId: UUID) {
@@ -42,13 +42,13 @@ class ExpenseManagementService(
         expensePersistencePort.delete(expenseId)
     }
 
-    override fun getById(expenseId: UUID): ExpenseDomainModel {
+    override fun getById(expenseId: UUID): Expense {
         LOGGER.info { "Fetching expense $expenseId" }
         expenseValidator.checkIfExpenseExists(expenseId)
         return expensePersistencePort.getById(expenseId)!!
     }
 
-    override fun getAllByBalanceGroup(balanceGroupId: UUID): List<ExpenseDomainModel> {
+    override fun getAllByBalanceGroup(balanceGroupId: UUID): List<Expense> {
         LOGGER.info { "Fetching all expenses for balance group $balanceGroupId" }
         expenseValidator.checkBalanceGroupExists(balanceGroupId)
         return expensePersistencePort.getAllByBalanceGroup(balanceGroupId)

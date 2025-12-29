@@ -1,4 +1,4 @@
-package com.example.expense_management_server.domain.balancegroup.exception
+package com.example.expense_management_server.domain.balance.exception
 
 import java.util.UUID
 
