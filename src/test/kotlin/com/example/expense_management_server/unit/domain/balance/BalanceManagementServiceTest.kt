@@ -1,10 +1,11 @@
-package com.example.expense_management_server.unit.domain.balancegroup
+package com.example.expense_management_server.unit.domain.balance
 
-import com.example.expense_management_server.domain.balancegroup.BalanceGroupManagementService
-import com.example.expense_management_server.domain.balancegroup.BalanceGroupValidator
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
-import com.example.expense_management_server.domain.user.model.UserDomainModel
+import com.example.expense_management_server.domain.balance.BalanceGroupValidator
+import com.example.expense_management_server.domain.balance.BalanceManagementService
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
+import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -20,7 +21,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
-class BalanceGroupManagementServiceTest {
+class BalanceManagementServiceTest {
 
     @Mock
     private lateinit var balanceGroupPersistencePort: IBalanceGroupPersistencePort
@@ -31,15 +32,19 @@ class BalanceGroupManagementServiceTest {
     @Mock
     private lateinit var userPersistencePort: IUserPersistencePort
 
-    private lateinit var balanceGroupService: BalanceGroupManagementService
+    @Mock
+    private lateinit var expenseManagementFacade: IExpenseManagementFacade
+
+    private lateinit var balanceManagementService: BalanceManagementService
 
     @BeforeEach
     fun setUp() {
-        balanceGroupService =
-            BalanceGroupManagementService(
+        balanceManagementService =
+            BalanceManagementService(
                 balanceGroupPersistencePort = balanceGroupPersistencePort,
                 balanceGroupValidator = balanceGroupValidator,
-                userPersistencePort = userPersistencePort
+                userPersistencePort = userPersistencePort,
+                expenseManagementFacade = expenseManagementFacade
             )
     }
 
@@ -50,7 +55,7 @@ class BalanceGroupManagementServiceTest {
             .thenReturn(BALANCE_GROUP)
 
         // when
-        val result = balanceGroupService.save(BALANCE_GROUP)
+        val result = balanceManagementService.save(BALANCE_GROUP)
 
         // then
         assertThat(result).isEqualTo(BALANCE_GROUP)
@@ -66,7 +71,7 @@ class BalanceGroupManagementServiceTest {
         whenever(balanceGroupPersistencePort.update(BALANCE_GROUP_ID, expected))
             .thenReturn(expected)
         // when
-        val result = balanceGroupService.update(BALANCE_GROUP_ID, expected)
+        val result = balanceManagementService.update(BALANCE_GROUP_ID, expected)
 
         // then
         assertThat(result).isEqualTo(expected)
@@ -82,7 +87,7 @@ class BalanceGroupManagementServiceTest {
             .thenReturn(BALANCE_GROUP)
 
         // when
-        val result = balanceGroupService.getById(BALANCE_GROUP_ID)
+        val result = balanceManagementService.getById(BALANCE_GROUP_ID)
 
         // then
         assertThat(result).isEqualTo(BALANCE_GROUP)
@@ -93,14 +98,14 @@ class BalanceGroupManagementServiceTest {
     @Test
     fun `when user is group member should return all balance groups`() {
         // given
-        val user = mock<UserDomainModel>()
+        val user = mock<UserModel>()
         whenever(userPersistencePort.findUserAccountById(MEMBER_ID))
             .thenReturn(user)
         whenever(balanceGroupPersistencePort.getAllWhereUserIsGroupMember(MEMBER_ID))
             .thenReturn(listOf(BALANCE_GROUP))
 
         // when
-        val result = balanceGroupService.getAllWhereUserIsGroupMember(MEMBER_ID)
+        val result = balanceManagementService.getAllWhereUserIsGroupMember(MEMBER_ID)
 
         // then
         assertThat(result).isEqualTo(listOf(BALANCE_GROUP))
@@ -116,7 +121,7 @@ class BalanceGroupManagementServiceTest {
             .thenReturn(BALANCE_GROUP)
 
         // when
-        balanceGroupService.delete(BALANCE_GROUP_ID)
+        balanceManagementService.delete(BALANCE_GROUP_ID)
 
         // then
         verify(balanceGroupPersistencePort).delete(BALANCE_GROUP_ID)
@@ -131,7 +136,7 @@ class BalanceGroupManagementServiceTest {
         private val MEMBER_ID = UUID.fromString("51372e8b-83b0-4525-9fe0-c48fea02f39d")
         private const val GROUP_NAME = "test"
 
-        private val BALANCE_GROUP = BalanceGroupDomainModel(
+        private val BALANCE_GROUP = BalanceGroup(
             id = BALANCE_GROUP_ID,
             groupName = GROUP_NAME,
             groupMemberIds = listOf(GROUP_OWNER_ID, MEMBER_ID),

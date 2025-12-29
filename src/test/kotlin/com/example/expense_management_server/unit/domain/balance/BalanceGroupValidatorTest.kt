@@ -1,10 +1,10 @@
-package com.example.expense_management_server.unit.domain.balancegroup
+package com.example.expense_management_server.unit.domain.balance
 
-import com.example.expense_management_server.domain.balancegroup.BalanceGroupValidator
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.BalanceGroupValidator
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
@@ -152,7 +152,7 @@ class BalanceGroupValidatorTest {
         private val EXPENSE_ID = UUID.fromString("7f8e2631-d780-405c-85dd-2638f95e3134")
         private val MEMBER_ID = UUID.fromString("51372e8b-83b0-4525-9fe0-c48fea02f39d")
         private const val GROUP_NAME = "test"
-        private val BALANCE_GROUP = BalanceGroupDomainModel(
+        private val BALANCE_GROUP = BalanceGroup(
             id = BALANCE_GROUP_ID,
             groupName = GROUP_NAME,
             groupMemberIds = listOf(GROUP_OWNER_ID, MEMBER_ID),

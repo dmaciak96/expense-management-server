@@ -8,8 +8,8 @@ import com.example.expense_management_server.domain.user.exception.PasswordValid
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.AccountStatus
-import com.example.expense_management_server.domain.user.model.UserDomainModel
-import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
+import com.example.expense_management_server.domain.user.model.UserHttpModel
+import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
 import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
 import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
@@ -254,7 +254,7 @@ class UserManagementServiceTest {
             updatedAt = null
         )
 
-        val updateModel = UserHttpDomainModel(
+        val updateModel = UserHttpModel(
             email = EMAIL,
             nickname = NICKNAME,
             password = PASSWORD
@@ -285,7 +285,7 @@ class UserManagementServiceTest {
         // then
         assertThat(result).isEqualTo(savedUser)
 
-        val captor = argumentCaptor<UserDomainModel>()
+        val captor = argumentCaptor<UserModel>()
         verify(userPersistencePort).findUserAccountById(USER_ID)
         verify(passwordValidator).validate(PASSWORD)
         verify(passwordEncoderPort).encodePassword(PASSWORD)
@@ -312,7 +312,7 @@ class UserManagementServiceTest {
             updatedAt = null
         )
 
-        val updateModel = UserHttpDomainModel(
+        val updateModel = UserHttpModel(
             email = NEW_EMAIL,
             nickname = NEW_NICKNAME,
             password = PASSWORD
@@ -349,7 +349,7 @@ class UserManagementServiceTest {
         // then
         assertThat(result).isEqualTo(savedUser)
 
-        val captor = argumentCaptor<UserDomainModel>()
+        val captor = argumentCaptor<UserModel>()
         verify(userPersistencePort).findUserAccountById(USER_ID)
         verify(userPersistencePort).findUserAccountByEmail(NEW_EMAIL)
         verify(passwordValidator).validate(PASSWORD)
@@ -372,7 +372,7 @@ class UserManagementServiceTest {
         whenever(userPersistencePort.findUserAccountById(USER_ID))
             .thenReturn(null)
 
-        val updateModel = UserHttpDomainModel(
+        val updateModel = UserHttpModel(
             email = EMAIL,
             nickname = NICKNAME,
             password = PASSWORD
@@ -396,7 +396,7 @@ class UserManagementServiceTest {
             nickname = NICKNAME
         )
 
-        val updateModel = UserHttpDomainModel(
+        val updateModel = UserHttpModel(
             email = NEW_EMAIL,
             nickname = NEW_NICKNAME,
             password = PASSWORD
@@ -427,7 +427,7 @@ class UserManagementServiceTest {
             nickname = NICKNAME
         )
 
-        val updateModel = UserHttpDomainModel(
+        val updateModel = UserHttpModel(
             email = EMAIL,          // email bez zmiany
             nickname = NICKNAME,
             password = PASSWORD
@@ -460,7 +460,7 @@ class UserManagementServiceTest {
             nickname = NICKNAME
         )
 
-        val updateModel = UserHttpDomainModel(
+        val updateModel = UserHttpModel(
             email = EMAIL,
             nickname = null,
             password = PASSWORD
@@ -492,7 +492,7 @@ class UserManagementServiceTest {
         // then
         assertThat(result).isEqualTo(savedUser)
 
-        val captor = argumentCaptor<UserDomainModel>()
+        val captor = argumentCaptor<UserModel>()
         verify(userPersistencePort).findUserAccountById(USER_ID)
         verify(passwordValidator).validate(PASSWORD)
         verify(passwordEncoderPort).encodePassword(PASSWORD)
@@ -524,7 +524,7 @@ class UserManagementServiceTest {
         assertThrows<NicknameValidationException> {
             userManagementService.updateUser(
                 USER_ID,
-                UserHttpDomainModel(
+                UserHttpModel(
                     email = EMAIL,
                     nickname = "",
                     password = PASSWORD
@@ -535,7 +535,7 @@ class UserManagementServiceTest {
         assertThrows<NicknameValidationException> {
             userManagementService.updateUser(
                 USER_ID,
-                UserHttpDomainModel(
+                UserHttpModel(
                     email = EMAIL,
                     nickname = "   ",
                     password = PASSWORD
@@ -588,13 +588,13 @@ class UserManagementServiceTest {
         private const val NEW_EMAIL = "new@example.com"
         private const val NEW_NICKNAME = "new-nickname"
 
-        private val REGISTRATION_MODEL = UserHttpDomainModel(
+        private val REGISTRATION_MODEL = UserHttpModel(
             email = EMAIL,
             nickname = NICKNAME,
             password = PASSWORD
         )
 
-        private val USER_ACCOUNT_MODEL = UserDomainModel(
+        private val USER_ACCOUNT_MODEL = UserModel(
             id = USER_ID,
             email = REGISTRATION_MODEL.email,
             nickname = "existing",

@@ -4,13 +4,13 @@ import com.example.expense_management_server.adapter.api.model.BalanceGroupReque
 import com.example.expense_management_server.adapter.api.model.BalanceGroupResponse
 import com.example.expense_management_server.adapter.api.model.ExpenseRequest
 import com.example.expense_management_server.adapter.api.model.ExpenseResponse
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
-import com.example.expense_management_server.domain.facade.IBalanceGroupManagementFacade
+import com.example.expense_management_server.domain.expense.model.Expense
+import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
 import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
 import com.example.expense_management_server.domain.user.port.ISecurityPort
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -36,7 +36,7 @@ import java.util.UUID
 @RestController
 @RequestMapping("/balance-groups")
 class BalanceGroupController(
-    private val balanceGroupFacade: IBalanceGroupManagementFacade,
+    private val balanceGroupFacade: IBalanceManagementFacade,
     private val expenseFacade: IExpenseManagementFacade,
     private val securityPort: ISecurityPort
 ) {
@@ -46,14 +46,18 @@ class BalanceGroupController(
     fun getById(@PathVariable balanceGroupId: UUID): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: fetch balance group by id $balanceGroupId " }
         val balanceGroup = balanceGroupFacade.getById(balanceGroupId)
-        return BalanceGroupResponse.from(balanceGroup)
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     @GetMapping
     fun getAllWhereUserIsMember(): List<BalanceGroupResponse> {
         LOGGER.info { "HTTP request received: fetch Balance groups" }
         return balanceGroupFacade.getAllWhereUserIsGroupMember(securityPort.getCurrentLoginUserId())
-            .map { BalanceGroupResponse.from(it) }
+            .map {
+                val balance = balanceGroupFacade.calculateBalance(it.id!!, securityPort.getCurrentLoginUserId())
+                BalanceGroupResponse.from(it, balance)
+            }
     }
 
     @DeleteMapping("/{balanceGroupId}")
@@ -68,8 +72,9 @@ class BalanceGroupController(
     @ResponseStatus(HttpStatus.CREATED)
     fun save(@RequestBody balanceGroupRequest: BalanceGroupRequest): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: creating new balance group ${balanceGroupRequest.groupName}" }
-        val savedBalanceGroup = balanceGroupFacade.save(mapBalanceGroup(balanceGroupRequest))
-        return BalanceGroupResponse.from(savedBalanceGroup)
+        val balanceGroup = balanceGroupFacade.save(mapBalanceGroup(balanceGroupRequest))
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     @PutMapping("/{balanceGroupId}")
@@ -79,8 +84,9 @@ class BalanceGroupController(
         @RequestBody balanceGroupRequest: BalanceGroupRequest
     ): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: updating balance group $balanceGroupId" }
-        val updatedBalanceGroup = balanceGroupFacade.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
-        return BalanceGroupResponse.from(updatedBalanceGroup)
+        val balanceGroup = balanceGroupFacade.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     // --------------------------------EXPENSES--------------------------------
@@ -148,7 +154,7 @@ class BalanceGroupController(
     }
 
     private fun mapBalanceGroup(balanceGroupRequest: BalanceGroupRequest) =
-        BalanceGroupDomainModel(
+        BalanceGroup(
             id = null,
             groupName = balanceGroupRequest.groupName,
             groupMemberIds = balanceGroupRequest.groupMemberIds,
@@ -158,7 +164,7 @@ class BalanceGroupController(
             updatedAt = null
         )
 
-    private fun mapExpense(expenseRequest: ExpenseRequest, balanceGroupId: UUID) = ExpenseDomainModel(
+    private fun mapExpense(expenseRequest: ExpenseRequest, balanceGroupId: UUID) = Expense(
         id = null,
         name = expenseRequest.name,
         balanceGroupId = balanceGroupId,

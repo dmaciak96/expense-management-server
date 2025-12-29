@@ -7,8 +7,8 @@ import com.example.expense_management_server.domain.user.exception.NicknameValid
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
-import com.example.expense_management_server.domain.user.model.UserDomainModel
-import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
+import com.example.expense_management_server.domain.user.model.UserHttpModel
+import com.example.expense_management_server.domain.user.model.UserModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -38,7 +38,7 @@ class UserManagementController(
     @ResponseStatus(HttpStatus.CREATED)
     fun registerNewUser(@RequestBody @Valid userRequest: UserRequest): UserResponse {
         val registeredUser = userManagementFacade.registerNewUser(
-            UserHttpDomainModel(
+            UserHttpModel(
                 email = userRequest.email,
                 password = userRequest.password,
                 nickname = userRequest.nickname,
@@ -46,7 +46,7 @@ class UserManagementController(
         )
 
         LOGGER.debug { "Building HTTP response after successfully user registration" }
-        return map(userDomainModel = registeredUser)
+        return map(userModel = registeredUser)
     }
 
     @GetMapping("/{userId}")
@@ -64,7 +64,7 @@ class UserManagementController(
     ): UserResponse {
         LOGGER.info { "Update account request received" }
         val updatedUser = userManagementFacade.updateUser(
-            userId, UserHttpDomainModel(
+            userId, UserHttpModel(
                 email = userRequest.email,
                 password = userRequest.password,
                 nickname = userRequest.nickname,
@@ -84,16 +84,16 @@ class UserManagementController(
     }
 
 
-    private fun map(userDomainModel: UserDomainModel) =
+    private fun map(userModel: UserModel) =
         UserResponse(
-            id = userDomainModel.id,
-            email = userDomainModel.email,
-            nickname = userDomainModel.nickname,
-            emailVerified = userDomainModel.isEmailVerified,
-            createdAt = userDomainModel.createdAt,
-            updatedAt = userDomainModel.updatedAt,
-            lastLoginAt = userDomainModel.lastLoginAt,
-            accountStatus = userDomainModel.accountStatus,
+            id = userModel.id,
+            email = userModel.email,
+            nickname = userModel.nickname,
+            emailVerified = userModel.isEmailVerified,
+            createdAt = userModel.createdAt,
+            updatedAt = userModel.updatedAt,
+            lastLoginAt = userModel.lastLoginAt,
+            accountStatus = userModel.accountStatus,
         )
 
     companion object {

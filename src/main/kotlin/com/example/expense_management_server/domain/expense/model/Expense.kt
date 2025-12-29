@@ -3,7 +3,7 @@ package com.example.expense_management_server.domain.expense.model
 import java.time.OffsetDateTime
 import java.util.UUID
 
-data class ExpenseDomainModel(
+data class Expense(
     val id: UUID?,
     val name: String,
     val balanceGroupId: UUID,

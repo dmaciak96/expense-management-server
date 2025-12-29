@@ -1,9 +1,9 @@
 package com.example.expense_management_server.domain.expense
 
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -17,7 +17,7 @@ class ExpenseValidator(
     private val userPersistencePort: IUserPersistencePort,
 ) {
 
-    fun validate(expense: ExpenseDomainModel) {
+    fun validate(expense: Expense) {
         checkIfOwnerExists(expense.expenseOwnerId)
         checkBalanceGroupExists(expense.balanceGroupId)
         checkExpenseOwnerIsGroupMember(expense.balanceGroupId, expense.expenseOwnerId)
@@ -25,12 +25,12 @@ class ExpenseValidator(
         checkIfAmountIsLessThanZero(expense.amount)
     }
 
-    fun validateForUpdate(expenseId: UUID, expenseUpdateData: ExpenseDomainModel) {
+    fun validateForUpdate(expenseId: UUID, expense: Expense) {
         checkIfExpenseExists(expenseId)
-        validate(expenseUpdateData)
+        validate(expense)
         val existingExpense = expensePersistencePort.getById(expenseId)!!
-        checkIfBalanceGroupWasChanged(existingExpense, expenseUpdateData)
-        checkIfExpenseOwnerWasChanged(existingExpense, expenseUpdateData)
+        checkIfBalanceGroupWasChanged(existingExpense, expense)
+        checkIfExpenseOwnerWasChanged(existingExpense, expense)
     }
 
     fun checkIfExpenseExists(expenseId: UUID) {
@@ -60,20 +60,20 @@ class ExpenseValidator(
     }
 
     private fun checkIfBalanceGroupWasChanged(
-        existingExpense: ExpenseDomainModel,
-        expenseUpdateData: ExpenseDomainModel
+        existingExpense: Expense,
+        expense: Expense
     ) {
-        if (existingExpense.balanceGroupId != expenseUpdateData.balanceGroupId) {
+        if (existingExpense.balanceGroupId != expense.balanceGroupId) {
             LOGGER.debug { "Tried to change balance group for expense ${existingExpense.id}. This is not supported" }
             throw ExpenseValidationException("Moving expenses between balance groups is not supported")
         }
     }
 
     private fun checkIfExpenseOwnerWasChanged(
-        existingExpense: ExpenseDomainModel,
-        expenseUpdateData: ExpenseDomainModel
+        existingExpense: Expense,
+        expense: Expense
     ) {
-        if (existingExpense.expenseOwnerId != expenseUpdateData.expenseOwnerId) {
+        if (existingExpense.expenseOwnerId != expense.expenseOwnerId) {
             LOGGER.debug { "Tried to change expense owner for expense ${existingExpense.id}. This is not supported" }
             throw ExpenseValidationException("Changing expense owner for expense ${existingExpense.id}")
         }

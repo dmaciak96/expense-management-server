@@ -5,8 +5,8 @@ import com.example.expense_management_server.adapter.api.model.UserRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
 import com.example.expense_management_server.domain.facade.IUserManagementFacade
 import com.example.expense_management_server.domain.user.model.AccountStatus
-import com.example.expense_management_server.domain.user.model.UserDomainModel
-import com.example.expense_management_server.domain.user.model.UserHttpDomainModel
+import com.example.expense_management_server.domain.user.model.UserHttpModel
+import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -101,7 +101,7 @@ class UserManagementControllerTest {
         private val EMAIL = "test@test.com"
         private val NICKNAME = "testUser"
 
-        private val USER_DOMAIN_MODEL = UserDomainModel(
+        private val USER_DOMAIN_MODEL = UserModel(
             id = USER_ID,
             email = EMAIL,
             nickname = NICKNAME,
@@ -114,7 +114,7 @@ class UserManagementControllerTest {
             accountStatus = AccountStatus.ACTIVE
         )
 
-        private val USER_REGISTRATION_DOMAIN_MODEL = UserHttpDomainModel(
+        private val USER_REGISTRATION_DOMAIN_MODEL = UserHttpModel(
             email = EMAIL,
             password = PASSWORD,
             nickname = NICKNAME,

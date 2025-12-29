@@ -1,15 +1,15 @@
 package com.example.expense_management_server.unit.domain.expense
 
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.ExpenseValidator
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.expense.model.ExpenseSplitType
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import com.example.expense_management_server.domain.user.model.AccountStatus
-import com.example.expense_management_server.domain.user.model.UserDomainModel
+import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
@@ -52,7 +52,7 @@ class ExpenseValidatorTest {
     @Test
     fun `should validate expense when name is not blank, balance group exists, user is member and amount is positive`() {
         // given
-        val balanceGroup = mock<BalanceGroupDomainModel>()
+        val balanceGroup = mock<BalanceGroup>()
         whenever(balanceGroup.groupMemberIds).thenReturn(listOf(EXPENSE_OWNER_ID))
         whenever(userPersistencePort.findUserAccountById(EXPENSE_OWNER_ID)).thenReturn(EXPENSE_CREATOR)
         whenever(balanceGroupPersistencePort.getById(BALANCE_GROUP_ID)).thenReturn(balanceGroup)
@@ -69,7 +69,7 @@ class ExpenseValidatorTest {
     fun `should throw ExpenseValidationException when expense name is blank`() {
         // given
         val expense = EXPENSE_MODEL.copy(name = "   ")
-        val balanceGroup = mock<BalanceGroupDomainModel>()
+        val balanceGroup = mock<BalanceGroup>()
         whenever(balanceGroup.groupMemberIds).thenReturn(listOf(EXPENSE_OWNER_ID))
         whenever(userPersistencePort.findUserAccountById(EXPENSE_OWNER_ID)).thenReturn(EXPENSE_CREATOR)
         whenever(balanceGroupPersistencePort.getById(BALANCE_GROUP_ID)).thenReturn(balanceGroup)
@@ -101,7 +101,7 @@ class ExpenseValidatorTest {
     @Test
     fun `should throw ExpenseValidationException when current user is not a member of balance group`() {
         // given
-        val balanceGroup = mock<BalanceGroupDomainModel>()
+        val balanceGroup = mock<BalanceGroup>()
         whenever(balanceGroup.groupMemberIds).thenReturn(listOf(OTHER_USER_ID))
         whenever(balanceGroupPersistencePort.getById(BALANCE_GROUP_ID)).thenReturn(balanceGroup)
         whenever(userPersistencePort.findUserAccountById(EXPENSE_OWNER_ID)).thenReturn(EXPENSE_CREATOR)
@@ -117,7 +117,7 @@ class ExpenseValidatorTest {
     @Test
     fun `should throw ExpenseValidationException when amount is zero`() {
         // given
-        val balanceGroup = mock<BalanceGroupDomainModel>()
+        val balanceGroup = mock<BalanceGroup>()
         whenever(balanceGroup.groupMemberIds).thenReturn(listOf(EXPENSE_OWNER_ID))
         whenever(balanceGroupPersistencePort.getById(BALANCE_GROUP_ID)).thenReturn(balanceGroup)
         whenever(userPersistencePort.findUserAccountById(EXPENSE_OWNER_ID)).thenReturn(EXPENSE_CREATOR)
@@ -133,7 +133,7 @@ class ExpenseValidatorTest {
     @Test
     fun `should throw ExpenseValidationException when amount is negative`() {
         // given
-        val balanceGroup = mock<BalanceGroupDomainModel>()
+        val balanceGroup = mock<BalanceGroup>()
         whenever(balanceGroup.groupMemberIds).thenReturn(listOf(EXPENSE_OWNER_ID))
         whenever(balanceGroupPersistencePort.getById(BALANCE_GROUP_ID)).thenReturn(balanceGroup)
         whenever(userPersistencePort.findUserAccountById(EXPENSE_OWNER_ID)).thenReturn(EXPENSE_CREATOR)
@@ -196,7 +196,7 @@ class ExpenseValidatorTest {
         private val EXPENSE_OWNER_ID = UUID.fromString("c4c3e0bf-5b1f-49ff-bb2c-5d6b6db5f16d")
         private const val EXPENSE_NAME = "Lunch"
         private const val AMOUNT = 10.0
-        private val EXPENSE_MODEL = ExpenseDomainModel(
+        private val EXPENSE_MODEL = Expense(
             id = EXPENSE_ID,
             name = EXPENSE_NAME,
             balanceGroupId = BALANCE_GROUP_ID,
@@ -206,7 +206,7 @@ class ExpenseValidatorTest {
             updatedAt = OffsetDateTime.now(),
             expenseOwnerId = EXPENSE_OWNER_ID
         )
-        private val EXPENSE_CREATOR = UserDomainModel(
+        private val EXPENSE_CREATOR = UserModel(
             id = EXPENSE_OWNER_ID, email = "",
             nickname = "",
             passwordHash = "",

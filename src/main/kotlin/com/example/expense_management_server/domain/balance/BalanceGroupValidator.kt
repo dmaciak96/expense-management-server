@@ -1,9 +1,9 @@
-package com.example.expense_management_server.domain.balancegroup
+package com.example.expense_management_server.domain.balance
 
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupNotFoundException
-import com.example.expense_management_server.domain.balancegroup.exception.BalanceGroupValidationException
-import com.example.expense_management_server.domain.balancegroup.model.BalanceGroupDomainModel
-import com.example.expense_management_server.domain.balancegroup.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
+import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
+import com.example.expense_management_server.domain.balance.model.BalanceGroup
+import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -17,26 +17,26 @@ class BalanceGroupValidator(
     private val userPersistencePort: IUserPersistencePort
 ) {
 
-    fun validate(balanceGroup: BalanceGroupDomainModel) {
+    fun validate(balanceGroup: BalanceGroup) {
         checkIfOwnerExists(balanceGroup.groupOwnerUserId)
         checkIfNameIsBlank(balanceGroup.groupName)
         checkIfAllMembersExists(balanceGroup.groupMemberIds)
         checkIfAllExpensesExists(balanceGroup.expenseIds)
     }
 
-    fun validateForUpdate(balanceGroupId: UUID, balanceGroupUpdateData: BalanceGroupDomainModel) {
-        validate(balanceGroupUpdateData)
+    fun validateForUpdate(balanceGroupId: UUID, balanceGroup: BalanceGroup) {
+        validate(balanceGroup)
         getIfBalanceGroupExists(balanceGroupId)
     }
 
-    fun getIfBalanceGroupExists(balanceGroupId: UUID): BalanceGroupDomainModel {
+    fun getIfBalanceGroupExists(balanceGroupId: UUID): BalanceGroup {
         val balanceGroup =
             balanceGroupPersistencePort.getById(balanceGroupId) ?: throw BalanceGroupNotFoundException(balanceGroupId)
         return balanceGroup
     }
 
-    private fun checkIfAllMembersExists(memberIds: List<UUID>) {
-        val notExistingUsers = memberIds
+    private fun checkIfAllMembersExists(balanceGroupMemberIds: List<UUID>) {
+        val notExistingUsers = balanceGroupMemberIds
             .filter { userPersistencePort.findUserAccountById(it) == null }
         if (notExistingUsers.isNotEmpty()) {
             LOGGER.debug { "Users not found in database $notExistingUsers" }

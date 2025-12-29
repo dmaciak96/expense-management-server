@@ -3,7 +3,7 @@ package com.example.expense_management_server.adapter.persistence
 import com.example.expense_management_server.adapter.persistence.model.UserEntity
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
-import com.example.expense_management_server.domain.user.model.UserDomainModel
+import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.port.IUserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
@@ -15,48 +15,48 @@ class UserPersistenceAdapter(
     private val userRepository: UserRepository
 ) : IUserPersistencePort {
 
-    override fun saveOrUpdateUserAccount(userModel: UserDomainModel): UserDomainModel =
+    override fun saveOrUpdateUserAccount(userModel: UserModel): UserModel =
         if (userModel.id == null) {
             saveUserAccount(userModel)
         } else {
             updateUserAccount(userModel)
         }
 
-    private fun saveUserAccount(userModel: UserDomainModel): UserDomainModel {
+    private fun saveUserAccount(userModel: UserModel): UserModel {
         LOGGER.debug { "Saving user account in database" }
-        val savedUser = userRepository.save(map(userModel))
+        val savedUser = userRepository.save(mapToEntity(userModel))
         LOGGER.debug { "User account saved in database" }
-        return map(savedUser)
+        return mapToModel(savedUser)
     }
 
-    private fun updateUserAccount(userModel: UserDomainModel): UserDomainModel {
+    private fun updateUserAccount(userModel: UserModel): UserModel {
         LOGGER.debug { "Updating user account ${userModel.id}" }
         val version = userRepository.findById(userModel.id!!).map { it.version }
             .orElseThrow { UserNotFoundException() }
-        val savedUser = userRepository.saveAndFlush(map(userModel, version))
+        val savedUser = userRepository.saveAndFlush(mapToEntity(userModel, version))
         LOGGER.debug { "User account was updated" }
-        return map(savedUser)
+        return mapToModel(savedUser)
     }
 
-    override fun findUserAccountByEmail(email: String): UserDomainModel? {
+    override fun findUserAccountByEmail(email: String): UserModel? {
         LOGGER.debug { "Get user account by e-mail address $email" }
         val user = userRepository.findByEmail(email) ?: return null
-        return map(user)
+        return mapToModel(user)
     }
 
-    override fun findUserAccountById(id: UUID): UserDomainModel? {
+    override fun findUserAccountById(id: UUID): UserModel? {
         LOGGER.debug { "Get user account by id" }
         return userRepository.findById(id)
-            .map { map(it) }
+            .map { mapToModel(it) }
             .getOrNull()
     }
 
-    override fun deleteUser(userDomainModel: UserDomainModel) {
-        userRepository.delete(map(userDomainModel))
-        LOGGER.debug { "User ${userDomainModel.email} was removed from database" }
+    override fun deleteUser(userModel: UserModel) {
+        userRepository.delete(mapToEntity(userModel))
+        LOGGER.debug { "User ${userModel.email} was removed from database" }
     }
 
-    private fun map(userModel: UserDomainModel, version: Int? = null): UserEntity =
+    private fun mapToEntity(userModel: UserModel, version: Int? = null): UserEntity =
         UserEntity(
             id = userModel.id,
             email = userModel.email,
@@ -71,8 +71,8 @@ class UserPersistenceAdapter(
             version = version
         )
 
-    private fun map(userEntity: UserEntity): UserDomainModel =
-        UserDomainModel(
+    private fun mapToModel(userEntity: UserEntity): UserModel =
+        UserModel(
             id = userEntity.id,
             email = userEntity.email,
             nickname = userEntity.nickname,

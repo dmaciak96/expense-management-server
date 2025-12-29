@@ -1,12 +1,12 @@
 package com.example.expense_management_server.domain.facade
 
-import com.example.expense_management_server.domain.expense.model.ExpenseDomainModel
+import com.example.expense_management_server.domain.expense.model.Expense
 import java.util.UUID
 
 interface IExpenseManagementFacade {
-    fun save(expenseDomainModel: ExpenseDomainModel): ExpenseDomainModel
-    fun update(expenseId: UUID, expenseDomainModel: ExpenseDomainModel): ExpenseDomainModel
+    fun save(expense: Expense): Expense
+    fun update(expenseId: UUID, expense: Expense): Expense
     fun delete(expenseId: UUID)
-    fun getById(expenseId: UUID): ExpenseDomainModel
-    fun getAllByBalanceGroup(balanceGroupId: UUID): List<ExpenseDomainModel>
+    fun getById(expenseId: UUID): Expense
+    fun getAllByBalanceGroup(balanceGroupId: UUID): List<Expense>
 }
