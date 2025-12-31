@@ -10,9 +10,9 @@ import com.example.expense_management_server.domain.balance.model.BalanceGroup
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
 import com.example.expense_management_server.domain.expense.model.Expense
-import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
-import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
-import com.example.expense_management_server.domain.facade.UserAuthorizationService
+import com.example.expense_management_server.domain.service.BalanceService
+import com.example.expense_management_server.domain.service.ExpenseService
+import com.example.expense_management_server.domain.service.UserAuthorizationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -36,8 +36,8 @@ import java.util.UUID
 @RestController
 @RequestMapping("/balance-groups")
 class BalanceGroupController(
-    private val balanceGroupFacade: IBalanceManagementFacade,
-    private val expenseFacade: IExpenseManagementFacade,
+    private val balanceService: BalanceService,
+    private val expenseService: ExpenseService,
     private val userAuthorizationService: UserAuthorizationService
 ) {
 
@@ -45,17 +45,18 @@ class BalanceGroupController(
     @PreAuthorize(IS_GROUP_MEMBER_OR_ADMIN_MATCHER)
     fun getById(@PathVariable balanceGroupId: UUID): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: fetch balance group by id $balanceGroupId " }
-        val balanceGroup = balanceGroupFacade.getById(balanceGroupId)
-        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
+        val balanceGroup = balanceService.getById(balanceGroupId)
+        val balance =
+            balanceService.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
         return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     @GetMapping
     fun getAllWhereUserIsMember(): List<BalanceGroupResponse> {
         LOGGER.info { "HTTP request received: fetch Balance groups" }
-        return balanceGroupFacade.getAllWhereUserIsGroupMember(userAuthorizationService.getCurrentLoginUserId())
+        return balanceService.getAllWhereUserIsGroupMember(userAuthorizationService.getCurrentLoginUserId())
             .map {
-                val balance = balanceGroupFacade.calculateBalance(it.id!!, userAuthorizationService.getCurrentLoginUserId())
+                val balance = balanceService.calculateBalance(it.id!!, userAuthorizationService.getCurrentLoginUserId())
                 BalanceGroupResponse.from(it, balance)
             }
     }
@@ -65,15 +66,16 @@ class BalanceGroupController(
     @PreAuthorize(IS_OWNER_OR_ADMIN_MATCHER)
     fun deleteById(@PathVariable balanceGroupId: UUID) {
         LOGGER.info { "HTTP request received: delete balance group $balanceGroupId " }
-        balanceGroupFacade.delete(balanceGroupId)
+        balanceService.delete(balanceGroupId)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun save(@RequestBody balanceGroupRequest: BalanceGroupRequest): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: creating new balance group ${balanceGroupRequest.groupName}" }
-        val balanceGroup = balanceGroupFacade.save(mapBalanceGroup(balanceGroupRequest))
-        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
+        val balanceGroup = balanceService.save(mapBalanceGroup(balanceGroupRequest))
+        val balance =
+            balanceService.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
         return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
@@ -84,8 +86,9 @@ class BalanceGroupController(
         @RequestBody balanceGroupRequest: BalanceGroupRequest
     ): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: updating balance group $balanceGroupId" }
-        val balanceGroup = balanceGroupFacade.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
-        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
+        val balanceGroup = balanceService.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
+        val balance =
+            balanceService.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
         return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
@@ -94,7 +97,7 @@ class BalanceGroupController(
     @PreAuthorize(IS_GROUP_MEMBER_OR_ADMIN_MATCHER)
     fun getExpensesByGroup(@PathVariable balanceGroupId: UUID): List<ExpenseResponse> {
         LOGGER.info { "HTTP request received: fetch expenses by balance group $balanceGroupId" }
-        return expenseFacade.getAllByBalanceGroup(balanceGroupId)
+        return expenseService.getAllByBalanceGroup(balanceGroupId)
             .map { ExpenseResponse.from(it) }
     }
 
@@ -105,7 +108,7 @@ class BalanceGroupController(
         @PathVariable expenseId: UUID
     ): ExpenseResponse {
         LOGGER.info { "HTTP request received: fetch expense $expenseId" }
-        val expenseDomainModel = expenseFacade.getById(expenseId)
+        val expenseDomainModel = expenseService.getById(expenseId)
         if (expenseDomainModel.balanceGroupId != balanceGroupId) {
             throw ExpenseNotFoundException(expenseId)
         }
@@ -120,11 +123,11 @@ class BalanceGroupController(
         @PathVariable expenseId: UUID
     ) {
         LOGGER.info { "HTTP request received: delete expense $expenseId from balance group $balanceGroupId" }
-        val expenseDomainModel = expenseFacade.getById(expenseId)
+        val expenseDomainModel = expenseService.getById(expenseId)
         if (expenseDomainModel.balanceGroupId != balanceGroupId) {
             throw ExpenseNotFoundException(expenseId)
         }
-        expenseFacade.delete(expenseId)
+        expenseService.delete(expenseId)
     }
 
     @PostMapping(
@@ -137,7 +140,7 @@ class BalanceGroupController(
         @RequestBody expenseRequest: ExpenseRequest
     ): ExpenseResponse {
         LOGGER.info { "HTTP request received: add new expense to balance group $balanceGroupId" }
-        val savedExpense = expenseFacade.save(mapExpense(expenseRequest, balanceGroupId))
+        val savedExpense = expenseService.save(mapExpense(expenseRequest, balanceGroupId))
         return ExpenseResponse.from(savedExpense)
     }
 
@@ -149,7 +152,7 @@ class BalanceGroupController(
         @RequestBody expenseRequest: ExpenseRequest
     ): ExpenseResponse {
         LOGGER.info { "HTTP request received: update expense $expenseId" }
-        val updatedExpense = expenseFacade.update(expenseId, mapExpense(expenseRequest, balanceGroupId))
+        val updatedExpense = expenseService.update(expenseId, mapExpense(expenseRequest, balanceGroupId))
         return ExpenseResponse.from(updatedExpense)
     }
 
@@ -177,13 +180,13 @@ class BalanceGroupController(
 
     companion object {
         private const val IS_GROUP_MEMBER_OR_ADMIN_MATCHER =
-            "@springSecurityAdapter.isAdmin() || @springSecurityAdapter.isBalanceGroupMember(#balanceGroupId)"
+            "@userAuthorizationService.checkIfCurrentUserIsAdmin() || @userAuthorizationService.checkIfCurrentUserIsBalanceGroupMember(#balanceGroupId)"
 
         private const val IS_OWNER_OR_ADMIN_MATCHER =
-            "@springSecurityAdapter.isAdmin() || @springSecurityAdapter.isBalanceGroupCreator(#balanceGroupId)"
+            "@userAuthorizationService.checkIfCurrentUserIsAdmin() || @userAuthorizationService.checkIfCurrentUserIsBalanceGroupCreator(#balanceGroupId)"
 
         private const val IS_EXPENSE_OWNER_OR_ADMIN_MATCHER =
-            "@springSecurityAdapter.isAdmin() || @springSecurityAdapter.isExpenseCreator(#expenseId)"
+            "@userAuthorizationService.checkIfCurrentUserIsAdmin() || @userAuthorizationService.checkIfCurrentUserIsExpenseCreator(#expenseId)"
         private val LOGGER = KotlinLogging.logger {}
     }
 }

@@ -2,7 +2,7 @@ package com.example.expense_management_server.adapter.api
 
 import com.example.expense_management_server.adapter.api.model.UserRequest
 import com.example.expense_management_server.adapter.api.model.UserResponse
-import com.example.expense_management_server.domain.facade.IUserManagementFacade
+import com.example.expense_management_server.domain.service.UserManagementService
 import com.example.expense_management_server.domain.user.exception.NicknameValidationException
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
@@ -32,12 +32,12 @@ import java.util.UUID
 @RestController
 @RequestMapping("/users")
 class UserManagementController(
-    private val userManagementFacade: IUserManagementFacade
+    private val userManagementService: UserManagementService
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun registerNewUser(@RequestBody @Valid userRequest: UserRequest): UserResponse {
-        val registeredUser = userManagementFacade.registerNewUser(
+        val registeredUser = userManagementService.registerNewUser(
             UserHttpModel(
                 email = userRequest.email,
                 password = userRequest.password,
@@ -52,7 +52,7 @@ class UserManagementController(
     @GetMapping("/{userId}")
     @PreAuthorize(IS_OWNER_OR_ADMIN_MATCHER)
     fun getUserDetails(@PathVariable userId: UUID): UserResponse {
-        val user = userManagementFacade.getUserById(userId)
+        val user = userManagementService.getUserById(userId)
         return map(user)
     }
 
@@ -63,7 +63,7 @@ class UserManagementController(
         @RequestBody @Valid userRequest: UserRequest
     ): UserResponse {
         LOGGER.info { "Update account request received" }
-        val updatedUser = userManagementFacade.updateUser(
+        val updatedUser = userManagementService.updateUser(
             userId, UserHttpModel(
                 email = userRequest.email,
                 password = userRequest.password,
@@ -80,7 +80,7 @@ class UserManagementController(
         @PathVariable userId: UUID,
     ) {
         LOGGER.info { "Remove account request received" }
-        userManagementFacade.deleteUser(userId)
+        userManagementService.deleteUser(userId)
     }
 
 

@@ -3,18 +3,18 @@ package com.example.expense_management_server.domain.balance
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Component
 class BalanceGroupValidator(
-    private val balanceGroupPersistencePort: IBalanceGroupPersistencePort,
-    private val expensePersistencePort: IExpensePersistencePort,
-    private val userPersistencePort: IUserPersistencePort
+    private val balanceGroupPersistencePort: BalanceGroupPersistencePort,
+    private val expensePersistencePort: ExpensePersistencePort,
+    private val userPersistencePort: UserPersistencePort
 ) {
 
     fun validate(balanceGroup: BalanceGroup) {

@@ -1,17 +1,17 @@
 package com.example.expense_management_server.unit.domain.expense
 
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.ExpenseValidator
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
 import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.expense.model.ExpenseSplitType
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,13 +30,13 @@ import java.util.UUID
 class ExpenseValidatorTest {
 
     @Mock
-    private lateinit var expensePersistencePort: IExpensePersistencePort
+    private lateinit var expensePersistencePort: ExpensePersistencePort
 
     @Mock
-    private lateinit var balanceGroupPersistencePort: IBalanceGroupPersistencePort
+    private lateinit var balanceGroupPersistencePort: BalanceGroupPersistencePort
 
     @Mock
-    private lateinit var userPersistencePort: IUserPersistencePort
+    private lateinit var userPersistencePort: UserPersistencePort
 
     private lateinit var expenseValidator: ExpenseValidator
 

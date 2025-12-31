@@ -1,6 +1,6 @@
 package com.example.expense_management_server.domain.user
 
-import com.example.expense_management_server.domain.facade.IUserManagementFacade
+import com.example.expense_management_server.domain.service.UserManagementService
 import com.example.expense_management_server.domain.user.exception.NicknameValidationException
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
@@ -9,9 +9,9 @@ import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserHttpModel
 import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.EmailVerificationPort
+import com.example.expense_management_server.domain.user.port.PasswordEncoderPort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.time.Clock
@@ -19,13 +19,13 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Service
-class UserManagementService(
-    private val userPersistencePort: IUserPersistencePort,
-    private val passwordEncoderPort: IPasswordEncoderPort,
-    private val emailVerificationPort: IEmailVerificationPort,
+class UserManagementServiceImpl(
+    private val userPersistencePort: UserPersistencePort,
+    private val passwordEncoderPort: PasswordEncoderPort,
+    private val emailVerificationPort: EmailVerificationPort,
     private val passwordValidator: PasswordValidator,
     private val clock: Clock,
-) : IUserManagementFacade {
+) : UserManagementService {
 
     override fun registerNewUser(userHttpModel: UserHttpModel): UserModel {
         LOGGER.info { "Registering new user account" }

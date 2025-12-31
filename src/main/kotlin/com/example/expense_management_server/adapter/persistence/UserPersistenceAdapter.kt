@@ -4,7 +4,7 @@ import com.example.expense_management_server.adapter.persistence.model.UserEntit
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.UserModel
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.UUID
@@ -13,7 +13,7 @@ import kotlin.jvm.optionals.getOrNull
 @Component
 class UserPersistenceAdapter(
     private val userRepository: UserRepository
-) : IUserPersistencePort {
+) : UserPersistencePort {
 
     override fun saveOrUpdateUserAccount(userModel: UserModel): UserModel =
         if (userModel.id == null) {

@@ -1,12 +1,12 @@
 package com.example.expense_management_server.unit.domain.balance
 
 import com.example.expense_management_server.domain.balance.BalanceGroupValidator
-import com.example.expense_management_server.domain.balance.BalanceManagementService
+import com.example.expense_management_server.domain.balance.BalanceServiceImpl
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
-import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
+import com.example.expense_management_server.domain.service.ExpenseService
 import com.example.expense_management_server.domain.user.model.UserModel
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,30 +21,30 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
-class BalanceManagementServiceTest {
+class BalanceServiceImplTest {
 
     @Mock
-    private lateinit var balanceGroupPersistencePort: IBalanceGroupPersistencePort
+    private lateinit var balanceGroupPersistencePort: BalanceGroupPersistencePort
 
     @Mock
     private lateinit var balanceGroupValidator: BalanceGroupValidator
 
     @Mock
-    private lateinit var userPersistencePort: IUserPersistencePort
+    private lateinit var userPersistencePort: UserPersistencePort
 
     @Mock
-    private lateinit var expenseManagementFacade: IExpenseManagementFacade
+    private lateinit var expenseService: ExpenseService
 
-    private lateinit var balanceManagementService: BalanceManagementService
+    private lateinit var balanceServiceImpl: BalanceServiceImpl
 
     @BeforeEach
     fun setUp() {
-        balanceManagementService =
-            BalanceManagementService(
+        balanceServiceImpl =
+            BalanceServiceImpl(
                 balanceGroupPersistencePort = balanceGroupPersistencePort,
                 balanceGroupValidator = balanceGroupValidator,
                 userPersistencePort = userPersistencePort,
-                expenseManagementFacade = expenseManagementFacade
+                expenseService = expenseService
             )
     }
 
@@ -55,7 +55,7 @@ class BalanceManagementServiceTest {
             .thenReturn(BALANCE_GROUP)
 
         // when
-        val result = balanceManagementService.save(BALANCE_GROUP)
+        val result = balanceServiceImpl.save(BALANCE_GROUP)
 
         // then
         assertThat(result).isEqualTo(BALANCE_GROUP)
@@ -71,7 +71,7 @@ class BalanceManagementServiceTest {
         whenever(balanceGroupPersistencePort.update(BALANCE_GROUP_ID, expected))
             .thenReturn(expected)
         // when
-        val result = balanceManagementService.update(BALANCE_GROUP_ID, expected)
+        val result = balanceServiceImpl.update(BALANCE_GROUP_ID, expected)
 
         // then
         assertThat(result).isEqualTo(expected)
@@ -87,7 +87,7 @@ class BalanceManagementServiceTest {
             .thenReturn(BALANCE_GROUP)
 
         // when
-        val result = balanceManagementService.getById(BALANCE_GROUP_ID)
+        val result = balanceServiceImpl.getById(BALANCE_GROUP_ID)
 
         // then
         assertThat(result).isEqualTo(BALANCE_GROUP)
@@ -105,7 +105,7 @@ class BalanceManagementServiceTest {
             .thenReturn(listOf(BALANCE_GROUP))
 
         // when
-        val result = balanceManagementService.getAllWhereUserIsGroupMember(MEMBER_ID)
+        val result = balanceServiceImpl.getAllWhereUserIsGroupMember(MEMBER_ID)
 
         // then
         assertThat(result).isEqualTo(listOf(BALANCE_GROUP))
@@ -121,7 +121,7 @@ class BalanceManagementServiceTest {
             .thenReturn(BALANCE_GROUP)
 
         // when
-        balanceManagementService.delete(BALANCE_GROUP_ID)
+        balanceServiceImpl.delete(BALANCE_GROUP_ID)
 
         // then
         verify(balanceGroupPersistencePort).delete(BALANCE_GROUP_ID)

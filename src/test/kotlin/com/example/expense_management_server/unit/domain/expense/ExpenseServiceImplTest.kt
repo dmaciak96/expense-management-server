@@ -1,9 +1,9 @@
 package com.example.expense_management_server.unit.domain.expense
 
-import com.example.expense_management_server.domain.expense.ExpenseManagementService
+import com.example.expense_management_server.domain.expense.ExpenseServiceImpl
 import com.example.expense_management_server.domain.expense.ExpenseValidator
 import com.example.expense_management_server.domain.expense.model.Expense
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,19 +19,19 @@ import org.mockito.kotlin.whenever
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
-class ExpenseManagementServiceTest {
+class ExpenseServiceImplTest {
 
     @Mock
-    private lateinit var expensePersistencePort: IExpensePersistencePort
+    private lateinit var expensePersistencePort: ExpensePersistencePort
 
     @Mock
     private lateinit var expenseValidator: ExpenseValidator
 
-    private lateinit var expenseManagementService: ExpenseManagementService
+    private lateinit var expenseServiceImpl: ExpenseServiceImpl
 
     @BeforeEach
     fun initialize() {
-        expenseManagementService = ExpenseManagementService(
+        expenseServiceImpl = ExpenseServiceImpl(
             expensePersistencePort = expensePersistencePort,
             expenseValidator = expenseValidator
         )
@@ -44,7 +44,7 @@ class ExpenseManagementServiceTest {
             .thenReturn(EXPENSE_MODEL)
 
         // when
-        val result = expenseManagementService.save(EXPENSE_MODEL)
+        val result = expenseServiceImpl.save(EXPENSE_MODEL)
 
         // then
         assertThat(result).isEqualTo(EXPENSE_MODEL)
@@ -62,7 +62,7 @@ class ExpenseManagementServiceTest {
             .thenReturn(EXPENSE_MODEL)
 
         // when
-        val result = expenseManagementService.update(EXPENSE_ID, EXPENSE_MODEL)
+        val result = expenseServiceImpl.update(EXPENSE_ID, EXPENSE_MODEL)
 
         // then
         assertThat(result).isEqualTo(EXPENSE_MODEL)
@@ -76,7 +76,7 @@ class ExpenseManagementServiceTest {
     @Test
     fun `should delete expense when expense exists`() {
         // when
-        expenseManagementService.delete(EXPENSE_ID)
+        expenseServiceImpl.delete(EXPENSE_ID)
 
         // then
         verify(expenseValidator).checkIfExpenseExists(EXPENSE_ID)
@@ -92,7 +92,7 @@ class ExpenseManagementServiceTest {
             .thenReturn(EXPENSE_MODEL)
 
         // when
-        val result = expenseManagementService.getById(EXPENSE_ID)
+        val result = expenseServiceImpl.getById(EXPENSE_ID)
 
         // then
         assertThat(result).isEqualTo(EXPENSE_MODEL)
@@ -110,7 +110,7 @@ class ExpenseManagementServiceTest {
             .thenReturn(EXPENSES)
 
         // when
-        val result = expenseManagementService.getAllByBalanceGroup(BALANCE_GROUP_ID)
+        val result = expenseServiceImpl.getAllByBalanceGroup(BALANCE_GROUP_ID)
 
         // then
         assertThat(result).isEqualTo(EXPENSES)
@@ -129,7 +129,7 @@ class ExpenseManagementServiceTest {
 
         // when & then
         assertThrows<RuntimeException> {
-            expenseManagementService.save(EXPENSE_MODEL)
+            expenseServiceImpl.save(EXPENSE_MODEL)
         }
 
         verify(expenseValidator).validate(EXPENSE_MODEL)
@@ -145,7 +145,7 @@ class ExpenseManagementServiceTest {
 
         // when & then
         assertThrows<RuntimeException> {
-            expenseManagementService.update(EXPENSE_ID, EXPENSE_MODEL)
+            expenseServiceImpl.update(EXPENSE_ID, EXPENSE_MODEL)
         }
 
         verifyNoInteractions(expensePersistencePort)
@@ -160,7 +160,7 @@ class ExpenseManagementServiceTest {
 
         // when & then
         assertThrows<RuntimeException> {
-            expenseManagementService.delete(EXPENSE_ID)
+            expenseServiceImpl.delete(EXPENSE_ID)
         }
 
         verify(expenseValidator).checkIfExpenseExists(EXPENSE_ID)
@@ -176,7 +176,7 @@ class ExpenseManagementServiceTest {
 
         // when & then
         assertThrows<RuntimeException> {
-            expenseManagementService.getAllByBalanceGroup(BALANCE_GROUP_ID)
+            expenseServiceImpl.getAllByBalanceGroup(BALANCE_GROUP_ID)
         }
 
         verify(expenseValidator).checkBalanceGroupExists(BALANCE_GROUP_ID)

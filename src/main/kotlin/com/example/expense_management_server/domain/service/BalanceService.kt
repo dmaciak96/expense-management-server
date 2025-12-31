@@ -1,9 +1,9 @@
-package com.example.expense_management_server.domain.facade
+package com.example.expense_management_server.domain.service
 
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
 import java.util.UUID
 
-interface IBalanceManagementFacade {
+interface BalanceService {
     fun save(balanceGroup: BalanceGroup): BalanceGroup
     fun update(balanceGroupId: UUID, balanceGroup: BalanceGroup): BalanceGroup
     fun delete(balanceGroupId: UUID)

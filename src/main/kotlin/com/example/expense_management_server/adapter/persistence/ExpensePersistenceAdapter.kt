@@ -7,7 +7,7 @@ import com.example.expense_management_server.domain.balance.exception.BalanceGro
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
 import com.example.expense_management_server.domain.expense.model.Expense
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.UUID
@@ -17,7 +17,7 @@ import kotlin.jvm.optionals.getOrNull
 class ExpensePersistenceAdapter(
     private val expenseRepository: ExpenseRepository,
     private val balanceGroupRepository: BalanceGroupRepository
-) : IExpensePersistencePort {
+) : ExpensePersistencePort {
 
     override fun save(expense: Expense): Expense {
         val savedEntity = expenseRepository.save(map(expense))

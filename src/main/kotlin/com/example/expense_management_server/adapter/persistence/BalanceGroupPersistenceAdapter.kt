@@ -6,7 +6,7 @@ import com.example.expense_management_server.adapter.persistence.repository.Expe
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -20,7 +20,7 @@ class BalanceGroupPersistenceAdapter(
     private val balanceGroupRepository: BalanceGroupRepository,
     private val userRepository: UserRepository,
     private val expenseRepository: ExpenseRepository,
-) : IBalanceGroupPersistencePort {
+) : BalanceGroupPersistencePort {
 
     override fun save(balanceGroup: BalanceGroup): BalanceGroup {
         val balanceGroupEntity = balanceGroupRepository.save(mapToModel(balanceGroup))

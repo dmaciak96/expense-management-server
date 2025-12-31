@@ -2,11 +2,11 @@ package com.example.expense_management_server.adapter.security
 
 import com.example.expense_management_server.adapter.security.exception.UserNotAuthenticatedException
 import com.example.expense_management_server.adapter.security.model.UserAccount
-import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
-import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
+import com.example.expense_management_server.domain.service.BalanceService
+import com.example.expense_management_server.domain.service.ExpenseService
 import com.example.expense_management_server.domain.user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.port.ISecurityPort
+import com.example.expense_management_server.domain.user.port.SecurityPort
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.util.UUID
@@ -14,9 +14,9 @@ import java.util.UUID
 
 @Component
 class SpringSecurityAdapter(
-    private val balanceGroupFacade: IBalanceManagementFacade,
-    private val expenseFacade: IExpenseManagementFacade,
-) : ISecurityPort {
+    private val balanceService: BalanceService,
+    private val expenseService: ExpenseService,
+) : SecurityPort {
 
     override fun getCurrentLoginUserId(): UUID {
         val securityContext = SecurityContextHolder.getContext()
@@ -39,7 +39,7 @@ class SpringSecurityAdapter(
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount
-        val balanceGroup = balanceGroupFacade.getById(balanceGroupId)
+        val balanceGroup = balanceService.getById(balanceGroupId)
         return balanceGroup.groupMemberIds.contains(account.id)
     }
 
@@ -47,7 +47,7 @@ class SpringSecurityAdapter(
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount
-        val balanceGroup = balanceGroupFacade.getById(balanceGroupId)
+        val balanceGroup = balanceService.getById(balanceGroupId)
         return balanceGroup.groupOwnerUserId == account.id
     }
 
@@ -55,7 +55,7 @@ class SpringSecurityAdapter(
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount
-        val expense = expenseFacade.getById(expenseId)
+        val expense = expenseService.getById(expenseId)
         return expense.expenseOwnerId == account.id
     }
 }

@@ -1,13 +1,13 @@
 package com.example.expense_management_server.domain.user
 
-import com.example.expense_management_server.domain.facade.UserAuthorizationService
-import com.example.expense_management_server.domain.user.port.ISecurityPort
+import com.example.expense_management_server.domain.service.UserAuthorizationService
+import com.example.expense_management_server.domain.user.port.SecurityPort
 import org.springframework.stereotype.Service
 import java.util.UUID
 
-@Service
+@Service("userAuthorizationService")
 class UserAuthorizationServiceImpl(
-    private val securityPort: ISecurityPort
+    private val securityPort: SecurityPort
 ) : UserAuthorizationService {
     override fun getCurrentLoginUserId(): UUID {
         return securityPort.getCurrentLoginUserId()

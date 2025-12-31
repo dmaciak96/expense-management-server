@@ -2,21 +2,21 @@ package com.example.expense_management_server.domain.balance
 
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
-import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
-import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
+import com.example.expense_management_server.domain.service.BalanceService
+import com.example.expense_management_server.domain.service.ExpenseService
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class BalanceManagementService(
-    private val balanceGroupPersistencePort: IBalanceGroupPersistencePort,
+class BalanceServiceImpl(
+    private val balanceGroupPersistencePort: BalanceGroupPersistencePort,
     private val balanceGroupValidator: BalanceGroupValidator,
-    private val userPersistencePort: IUserPersistencePort,
-    private val expenseManagementFacade: IExpenseManagementFacade
-) : IBalanceManagementFacade {
+    private val userPersistencePort: UserPersistencePort,
+    private val expenseService: ExpenseService
+) : BalanceService {
 
     override fun save(balanceGroup: BalanceGroup): BalanceGroup {
         LOGGER.info { "Saving new balance group" }
@@ -59,7 +59,7 @@ class BalanceManagementService(
             val membersCount = balanceGroup.groupMemberIds.size
             LOGGER.debug { "Expenses has to be split between $membersCount members" }
 
-            val balanceGroupExpenses = expenseManagementFacade.getAllByBalanceGroup(balanceGroupId)
+            val balanceGroupExpenses = expenseService.getAllByBalanceGroup(balanceGroupId)
             LOGGER.debug { "Balance group has ${balanceGroupExpenses.size} expenses" }
 
             val userExpenses = balanceGroupExpenses

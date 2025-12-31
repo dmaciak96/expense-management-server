@@ -1,17 +1,17 @@
 package com.example.expense_management_server.domain.expense
 
 import com.example.expense_management_server.domain.expense.model.Expense
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
-import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
+import com.example.expense_management_server.domain.service.ExpenseService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class ExpenseManagementService(
-    private val expensePersistencePort: IExpensePersistencePort,
+class ExpenseServiceImpl(
+    private val expensePersistencePort: ExpensePersistencePort,
     private val expenseValidator: ExpenseValidator,
-) : IExpenseManagementFacade {
+) : ExpenseService {
 
     override fun save(expense: Expense): Expense {
         LOGGER.info { "Saving expense $expense" }

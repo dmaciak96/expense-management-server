@@ -1,20 +1,20 @@
 package com.example.expense_management_server.domain.expense
 
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
 import com.example.expense_management_server.domain.expense.exception.ExpenseNotFoundException
 import com.example.expense_management_server.domain.expense.exception.ExpenseValidationException
 import com.example.expense_management_server.domain.expense.model.Expense
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Component
 class ExpenseValidator(
-    private val expensePersistencePort: IExpensePersistencePort,
-    private val balanceGroupPersistencePort: IBalanceGroupPersistencePort,
-    private val userPersistencePort: IUserPersistencePort,
+    private val expensePersistencePort: ExpensePersistencePort,
+    private val balanceGroupPersistencePort: BalanceGroupPersistencePort,
+    private val userPersistencePort: UserPersistencePort,
 ) {
 
     fun validate(expense: Expense) {

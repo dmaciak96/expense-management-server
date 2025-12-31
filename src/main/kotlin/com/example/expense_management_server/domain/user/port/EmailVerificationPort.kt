@@ -1,5 +1,5 @@
 package com.example.expense_management_server.domain.user.port
 
-interface IEmailVerificationPort {
+interface EmailVerificationPort {
     fun sendEmailVerificationMessage(email: String)
 }

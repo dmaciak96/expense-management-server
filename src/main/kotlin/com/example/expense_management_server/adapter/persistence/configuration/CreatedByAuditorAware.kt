@@ -1,6 +1,6 @@
 package com.example.expense_management_server.adapter.persistence.configuration
 
-import com.example.expense_management_server.domain.facade.UserAuthorizationService
+import com.example.expense_management_server.domain.service.UserAuthorizationService
 import org.springframework.data.domain.AuditorAware
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.stereotype.Component

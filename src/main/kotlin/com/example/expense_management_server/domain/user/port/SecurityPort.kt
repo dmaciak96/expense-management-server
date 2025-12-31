@@ -1,8 +1,8 @@
-package com.example.expense_management_server.domain.facade
+package com.example.expense_management_server.domain.user.port
 
 import java.util.UUID
 
-interface UserAuthorizationService {
+interface SecurityPort {
     fun getCurrentLoginUserId(): UUID
     fun checkIfCurrentUserIsAdmin(): Boolean
     fun checkIfCurrentUserIsBalanceGroupMember(balanceGroupId: UUID): Boolean

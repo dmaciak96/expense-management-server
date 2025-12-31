@@ -2,7 +2,7 @@ package com.example.expense_management_server.unit.domain.user
 
 import com.example.expense_management_server.domain.user.PasswordValidationCriteria
 import com.example.expense_management_server.domain.user.PasswordValidator
-import com.example.expense_management_server.domain.user.UserManagementService
+import com.example.expense_management_server.domain.user.UserManagementServiceImpl
 import com.example.expense_management_server.domain.user.exception.NicknameValidationException
 import com.example.expense_management_server.domain.user.exception.PasswordValidationException
 import com.example.expense_management_server.domain.user.exception.UserAlreadyExistsException
@@ -11,9 +11,9 @@ import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserHttpModel
 import com.example.expense_management_server.domain.user.model.UserModel
 import com.example.expense_management_server.domain.user.model.UserRole
-import com.example.expense_management_server.domain.user.port.IEmailVerificationPort
-import com.example.expense_management_server.domain.user.port.IPasswordEncoderPort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.user.port.EmailVerificationPort
+import com.example.expense_management_server.domain.user.port.PasswordEncoderPort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,21 +34,21 @@ import java.time.ZoneId
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
-class UserManagementServiceTest {
+class UserManagementServiceImplTest {
 
     @Mock
-    private lateinit var userPersistencePort: IUserPersistencePort
+    private lateinit var userPersistencePort: UserPersistencePort
 
     @Mock
-    private lateinit var passwordEncoderPort: IPasswordEncoderPort
+    private lateinit var passwordEncoderPort: PasswordEncoderPort
 
     @Mock
-    private lateinit var emailVerificationPort: IEmailVerificationPort
+    private lateinit var emailVerificationPort: EmailVerificationPort
 
     @Mock
     private lateinit var passwordValidator: PasswordValidator
 
-    private lateinit var userManagementService: UserManagementService
+    private lateinit var userManagementServiceImpl: UserManagementServiceImpl
 
     private val clock = Clock.fixed(
         Instant.parse("2018-04-29T10:15:30.00Z"),
@@ -57,7 +57,7 @@ class UserManagementServiceTest {
 
     @BeforeEach
     fun initialize() {
-        userManagementService = UserManagementService(
+        userManagementServiceImpl = UserManagementServiceImpl(
             userPersistencePort,
             passwordEncoderPort,
             emailVerificationPort,
@@ -82,7 +82,7 @@ class UserManagementServiceTest {
             .thenReturn(USER_ACCOUNT_MODEL)
 
         // when
-        val result = userManagementService.registerNewUser(REGISTRATION_MODEL)
+        val result = userManagementServiceImpl.registerNewUser(REGISTRATION_MODEL)
 
         // then
         assertThat(result).isEqualTo(USER_ACCOUNT_MODEL)
@@ -118,7 +118,7 @@ class UserManagementServiceTest {
             .thenReturn(accountModelWithoutNickname)
 
         // when
-        val result = userManagementService.registerNewUser(registrationModelWithoutNickname)
+        val result = userManagementServiceImpl.registerNewUser(registrationModelWithoutNickname)
 
         // then
         assertThat(result).isEqualTo(accountModelWithoutNickname)
@@ -144,7 +144,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<UserAlreadyExistsException> {
-            userManagementService.registerNewUser(REGISTRATION_MODEL)
+            userManagementServiceImpl.registerNewUser(REGISTRATION_MODEL)
         }
 
         verify(userPersistencePort).findUserAccountByEmail(EMAIL)
@@ -164,7 +164,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<PasswordValidationException> {
-            userManagementService.registerNewUser(REGISTRATION_MODEL)
+            userManagementServiceImpl.registerNewUser(REGISTRATION_MODEL)
         }
 
         verify(userPersistencePort).findUserAccountByEmail(REGISTRATION_MODEL.email)
@@ -186,11 +186,11 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<NicknameValidationException> {
-            userManagementService.registerNewUser(REGISTRATION_MODEL.copy(nickname = ""))
+            userManagementServiceImpl.registerNewUser(REGISTRATION_MODEL.copy(nickname = ""))
         }
 
         assertThrows<NicknameValidationException> {
-            userManagementService.registerNewUser(REGISTRATION_MODEL.copy(nickname = "   "))
+            userManagementServiceImpl.registerNewUser(REGISTRATION_MODEL.copy(nickname = "   "))
         }
     }
 
@@ -202,7 +202,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<UserNotFoundException> {
-            userManagementService.getUserByEmail(NOT_EXISTING_EMAIL)
+            userManagementServiceImpl.getUserByEmail(NOT_EXISTING_EMAIL)
         }
     }
 
@@ -213,7 +213,7 @@ class UserManagementServiceTest {
             .thenReturn(USER_ACCOUNT_MODEL)
 
         // when
-        val result = userManagementService.getUserByEmail(EMAIL)
+        val result = userManagementServiceImpl.getUserByEmail(EMAIL)
 
         // then
         assertThat(result).isEqualTo(USER_ACCOUNT_MODEL)
@@ -227,7 +227,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<UserNotFoundException> {
-            userManagementService.getUserById(NOT_EXISTING_USER_ID)
+            userManagementServiceImpl.getUserById(NOT_EXISTING_USER_ID)
         }
     }
 
@@ -238,7 +238,7 @@ class UserManagementServiceTest {
             .thenReturn(USER_ACCOUNT_MODEL)
 
         // when
-        val result = userManagementService.getUserById(USER_ID)
+        val result = userManagementServiceImpl.getUserById(USER_ID)
 
         // then
         assertThat(result).isEqualTo(USER_ACCOUNT_MODEL)
@@ -280,7 +280,7 @@ class UserManagementServiceTest {
             .thenReturn(savedUser)
 
         // when
-        val result = userManagementService.updateUser(USER_ID, updateModel)
+        val result = userManagementServiceImpl.updateUser(USER_ID, updateModel)
 
         // then
         assertThat(result).isEqualTo(savedUser)
@@ -344,7 +344,7 @@ class UserManagementServiceTest {
             .thenReturn(savedUser)
 
         // when
-        val result = userManagementService.updateUser(USER_ID, updateModel)
+        val result = userManagementServiceImpl.updateUser(USER_ID, updateModel)
 
         // then
         assertThat(result).isEqualTo(savedUser)
@@ -380,7 +380,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<UserNotFoundException> {
-            userManagementService.updateUser(USER_ID, updateModel)
+            userManagementServiceImpl.updateUser(USER_ID, updateModel)
         }
 
         verify(userPersistencePort).findUserAccountById(USER_ID)
@@ -410,7 +410,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<UserAlreadyExistsException> {
-            userManagementService.updateUser(USER_ID, updateModel)
+            userManagementServiceImpl.updateUser(USER_ID, updateModel)
         }
 
         verify(userPersistencePort).findUserAccountById(USER_ID)
@@ -443,7 +443,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<PasswordValidationException> {
-            userManagementService.updateUser(USER_ID, updateModel)
+            userManagementServiceImpl.updateUser(USER_ID, updateModel)
         }
 
         verify(userPersistencePort).findUserAccountById(USER_ID)
@@ -487,7 +487,7 @@ class UserManagementServiceTest {
             .thenReturn(savedUser)
 
         // when
-        val result = userManagementService.updateUser(USER_ID, updateModel)
+        val result = userManagementServiceImpl.updateUser(USER_ID, updateModel)
 
         // then
         assertThat(result).isEqualTo(savedUser)
@@ -522,7 +522,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<NicknameValidationException> {
-            userManagementService.updateUser(
+            userManagementServiceImpl.updateUser(
                 USER_ID,
                 UserHttpModel(
                     email = EMAIL,
@@ -533,7 +533,7 @@ class UserManagementServiceTest {
         }
 
         assertThrows<NicknameValidationException> {
-            userManagementService.updateUser(
+            userManagementServiceImpl.updateUser(
                 USER_ID,
                 UserHttpModel(
                     email = EMAIL,
@@ -551,7 +551,7 @@ class UserManagementServiceTest {
             .thenReturn(USER_ACCOUNT_MODEL)
 
         // when
-        userManagementService.deleteUser(USER_ID)
+        userManagementServiceImpl.deleteUser(USER_ID)
 
         // then
         verify(userPersistencePort).findUserAccountById(USER_ID)
@@ -569,7 +569,7 @@ class UserManagementServiceTest {
 
         // when & then
         assertThrows<UserNotFoundException> {
-            userManagementService.deleteUser(NOT_EXISTING_USER_ID)
+            userManagementServiceImpl.deleteUser(NOT_EXISTING_USER_ID)
         }
 
         verify(userPersistencePort).findUserAccountById(NOT_EXISTING_USER_ID)

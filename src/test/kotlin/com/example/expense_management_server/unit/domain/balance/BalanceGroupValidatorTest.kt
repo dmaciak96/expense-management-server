@@ -4,9 +4,9 @@ import com.example.expense_management_server.domain.balance.BalanceGroupValidato
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupNotFoundException
 import com.example.expense_management_server.domain.balance.exception.BalanceGroupValidationException
 import com.example.expense_management_server.domain.balance.model.BalanceGroup
-import com.example.expense_management_server.domain.balance.port.IBalanceGroupPersistencePort
-import com.example.expense_management_server.domain.expense.port.IExpensePersistencePort
-import com.example.expense_management_server.domain.user.port.IUserPersistencePort
+import com.example.expense_management_server.domain.balance.port.BalanceGroupPersistencePort
+import com.example.expense_management_server.domain.expense.port.ExpensePersistencePort
+import com.example.expense_management_server.domain.user.port.UserPersistencePort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -24,13 +24,13 @@ import kotlin.test.Test
 class BalanceGroupValidatorTest {
 
     @Mock
-    private lateinit var balanceGroupPersistencePort: IBalanceGroupPersistencePort
+    private lateinit var balanceGroupPersistencePort: BalanceGroupPersistencePort
 
     @Mock
-    private lateinit var expensePersistencePort: IExpensePersistencePort
+    private lateinit var expensePersistencePort: ExpensePersistencePort
 
     @Mock
-    private lateinit var userPersistencePort: IUserPersistencePort
+    private lateinit var userPersistencePort: UserPersistencePort
 
     private lateinit var balanceGroupValidator: BalanceGroupValidator
 
