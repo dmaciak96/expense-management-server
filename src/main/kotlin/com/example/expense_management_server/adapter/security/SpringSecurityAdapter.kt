@@ -28,14 +28,14 @@ class SpringSecurityAdapter(
         return userDetails.id
     }
 
-    override fun isAdmin(): Boolean {
+    override fun checkIfCurrentUserIsAdmin(): Boolean {
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount
         return account.role == UserRole.ADMIN
     }
 
-    override fun isBalanceGroupMember(balanceGroupId: UUID): Boolean {
+    override fun checkIfCurrentUserIsBalanceGroupMember(balanceGroupId: UUID): Boolean {
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount
@@ -43,7 +43,7 @@ class SpringSecurityAdapter(
         return balanceGroup.groupMemberIds.contains(account.id)
     }
 
-    override fun isBalanceGroupCreator(balanceGroupId: UUID): Boolean {
+    override fun checkIfCurrentUserIsBalanceGroupCreator(balanceGroupId: UUID): Boolean {
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount
@@ -51,7 +51,7 @@ class SpringSecurityAdapter(
         return balanceGroup.groupOwnerUserId == account.id
     }
 
-    override fun isExpenseCreator(expenseId: UUID): Boolean {
+    override fun checkIfCurrentUserIsExpenseCreator(expenseId: UUID): Boolean {
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication ?: throw UserNotAuthenticatedException()
         val account = authentication.principal as UserAccount

@@ -12,7 +12,7 @@ import com.example.expense_management_server.domain.expense.exception.ExpenseVal
 import com.example.expense_management_server.domain.expense.model.Expense
 import com.example.expense_management_server.domain.facade.IBalanceManagementFacade
 import com.example.expense_management_server.domain.facade.IExpenseManagementFacade
-import com.example.expense_management_server.domain.user.port.ISecurityPort
+import com.example.expense_management_server.domain.facade.UserAuthorizationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -38,7 +38,7 @@ import java.util.UUID
 class BalanceGroupController(
     private val balanceGroupFacade: IBalanceManagementFacade,
     private val expenseFacade: IExpenseManagementFacade,
-    private val securityPort: ISecurityPort
+    private val userAuthorizationService: UserAuthorizationService
 ) {
 
     @GetMapping("/{balanceGroupId}")
@@ -46,16 +46,16 @@ class BalanceGroupController(
     fun getById(@PathVariable balanceGroupId: UUID): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: fetch balance group by id $balanceGroupId " }
         val balanceGroup = balanceGroupFacade.getById(balanceGroupId)
-        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
         return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
     @GetMapping
     fun getAllWhereUserIsMember(): List<BalanceGroupResponse> {
         LOGGER.info { "HTTP request received: fetch Balance groups" }
-        return balanceGroupFacade.getAllWhereUserIsGroupMember(securityPort.getCurrentLoginUserId())
+        return balanceGroupFacade.getAllWhereUserIsGroupMember(userAuthorizationService.getCurrentLoginUserId())
             .map {
-                val balance = balanceGroupFacade.calculateBalance(it.id!!, securityPort.getCurrentLoginUserId())
+                val balance = balanceGroupFacade.calculateBalance(it.id!!, userAuthorizationService.getCurrentLoginUserId())
                 BalanceGroupResponse.from(it, balance)
             }
     }
@@ -73,7 +73,7 @@ class BalanceGroupController(
     fun save(@RequestBody balanceGroupRequest: BalanceGroupRequest): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: creating new balance group ${balanceGroupRequest.groupName}" }
         val balanceGroup = balanceGroupFacade.save(mapBalanceGroup(balanceGroupRequest))
-        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
         return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
@@ -85,7 +85,7 @@ class BalanceGroupController(
     ): BalanceGroupResponse {
         LOGGER.info { "HTTP request received: updating balance group $balanceGroupId" }
         val balanceGroup = balanceGroupFacade.update(balanceGroupId, mapBalanceGroup(balanceGroupRequest))
-        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, securityPort.getCurrentLoginUserId())
+        val balance = balanceGroupFacade.calculateBalance(balanceGroup.id!!, userAuthorizationService.getCurrentLoginUserId())
         return BalanceGroupResponse.from(balanceGroup, balance)
     }
 
@@ -159,7 +159,7 @@ class BalanceGroupController(
             groupName = balanceGroupRequest.groupName,
             groupMemberIds = balanceGroupRequest.groupMemberIds,
             expenseIds = emptyList(),
-            groupOwnerUserId = securityPort.getCurrentLoginUserId(),
+            groupOwnerUserId = userAuthorizationService.getCurrentLoginUserId(),
             createdAt = OffsetDateTime.now(),
             updatedAt = null
         )
@@ -168,7 +168,7 @@ class BalanceGroupController(
         id = null,
         name = expenseRequest.name,
         balanceGroupId = balanceGroupId,
-        expenseOwnerId = securityPort.getCurrentLoginUserId(),
+        expenseOwnerId = userAuthorizationService.getCurrentLoginUserId(),
         amount = expenseRequest.amount,
         splitType = expenseRequest.splitType,
         createdAt = OffsetDateTime.now(),
