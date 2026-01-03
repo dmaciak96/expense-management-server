@@ -124,7 +124,7 @@ class BalanceControllerTest : IntegrationTest() {
                     groupMemberIds = emptyList()
                 )
             )
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isCreated
             .expectBody<BalanceGroupResponse>()
@@ -149,7 +149,7 @@ class BalanceControllerTest : IntegrationTest() {
                     groupMemberIds = listOf(NOT_EXISTING_USER_ID)
                 )
             )
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isBadRequest
             .expectBody<ProblemDetail>()
@@ -170,7 +170,7 @@ class BalanceControllerTest : IntegrationTest() {
                     groupMemberIds = listOf(additionalUserId)
                 )
             )
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<BalanceGroupResponse>()
@@ -195,7 +195,7 @@ class BalanceControllerTest : IntegrationTest() {
                     groupMemberIds = listOf(additionalUserId)
                 )
             )
-            .headers { it.setBasicAuth(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserTwoToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -210,7 +210,7 @@ class BalanceControllerTest : IntegrationTest() {
                     groupMemberIds = listOf(additionalUserId)
                 )
             )
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isNotFound
     }
@@ -219,7 +219,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is balance group owner then should remove balance group and all related expenses`() {
         restTestClient.delete()
             .uri("/balance-groups/$standardUserBalanceGroupId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isNoContent
 
@@ -231,7 +231,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is balance group member then should get balance group by id`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId")
-            .headers { it.setBasicAuth(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserTwoToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<BalanceGroupResponse>()
@@ -250,7 +250,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when get all balance groups then should return balance groups where user is a member`() {
         restTestClient.get()
             .uri("/balance-groups")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<List<BalanceGroupResponse>>()
@@ -266,7 +266,7 @@ class BalanceControllerTest : IntegrationTest() {
 
         restTestClient.get()
             .uri("/balance-groups")
-            .headers { it.setBasicAuth(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserTwoToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<List<BalanceGroupResponse>>()
@@ -279,7 +279,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when adding new expense and user is balance group member then expense should be added to balance group`() {
         restTestClient.post()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses")
-            .headers { it.setBasicAuth(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserTwoToken) }
             .body(
                 ExpenseRequest(
                     name = "new-expense",
@@ -306,7 +306,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when adding new expense and user is not balance group member then should return 403`() {
         restTestClient.post()
             .uri("/balance-groups/$additionalUserBalanceGroupId/expenses")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .body(
                 ExpenseRequest(
                     name = "new-expense",
@@ -322,7 +322,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when removing expense from balance group and user is expense owner then should be removed from balance group`() {
         restTestClient.delete()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses/$additionalUserExpenseId")
-            .headers { it.setBasicAuth(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserTwoToken) }
             .exchange()
             .expectStatus().isNoContent
     }
@@ -331,7 +331,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is balance group owner then should get all expenses from balance group`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<List<ExpenseResponse>>()
@@ -345,7 +345,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is balance group member but not owner then should get all expenses from balance group`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses")
-            .headers { it.setBasicAuth(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserTwoToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<List<ExpenseResponse>>()
@@ -359,7 +359,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is balance group owner then should get expense by Id`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses/$standardUserExpenseId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<ExpenseResponse>()
@@ -379,7 +379,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is balance group member but not owner then should get expense by Id`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses/$additionalUserExpenseId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<ExpenseResponse>()
@@ -399,7 +399,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is not balance group member and not expense owner but expense exists in database then should return 403 when get expense by id`() {
         restTestClient.get()
             .uri("/balance-groups/$additionalUserBalanceGroupId/expenses/$standardUserExpenseId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -408,7 +408,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is not balance group member and not expense owner but expense exists in database then should return 403 when delete expense`() {
         restTestClient.delete()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses/$additionalUserExpenseId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -417,7 +417,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is not balance group member and not expense owner but expense exists in database then should return 403 when update expense`() {
         restTestClient.put()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses/$additionalUserExpenseId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .body(
                 ExpenseRequest(
                     name = "updated-expense",
@@ -433,7 +433,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is not balance group member and not owner then should return 403 when get balance group by id`() {
         restTestClient.get()
             .uri("/balance-groups/$additionalUserBalanceGroupId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -442,7 +442,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is not balance group member and not owner then should return 403 when update balance group`() {
         restTestClient.put()
             .uri("/balance-groups/$additionalUserBalanceGroupId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .body(
                 BalanceGroupRequest(
                     groupName = UPDATED_GROUP_NAME,
@@ -457,7 +457,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when user is not balance group member and not owner then should return 403 when delete balance group`() {
         restTestClient.delete()
             .uri("/balance-groups/$additionalUserBalanceGroupId")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -466,7 +466,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when logged user is admin then should create new balance group`() {
         restTestClient.post()
             .uri("/balance-groups")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .body(
                 BalanceGroupRequest(
                     groupName = UPDATED_GROUP_NAME,
@@ -491,7 +491,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when logged user is admin and is not balance group member and owner then should delete balance group`() {
         restTestClient.delete()
             .uri("/balance-groups/$standardUserBalanceGroupId")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .exchange()
             .expectStatus().isNoContent
 
@@ -503,7 +503,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when logged user is admin and is not balance group member and owner then should get balance group by Id`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<BalanceGroupResponse>()
@@ -521,7 +521,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when logged user is admin and is not balance group member and owner then should get all expenses from balance group`() {
         restTestClient.get()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<List<ExpenseResponse>>()
@@ -535,7 +535,7 @@ class BalanceControllerTest : IntegrationTest() {
     fun `when logged user is admin and is not balance group member, owner and expense owner then should remove expense from balance group`() {
         restTestClient.delete()
             .uri("/balance-groups/$standardUserBalanceGroupId/expenses/$additionalUserExpenseId")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .exchange()
             .expectStatus().isNoContent
 

@@ -13,9 +13,9 @@ version = '0.0.1-SNAPSHOT'
 description = 'Expense management server application'
 
 java {
-	toolchain {
+    toolchain {
         languageVersion = JavaLanguageVersion.of(25)
-	}
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -23,7 +23,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
@@ -34,8 +34,10 @@ dependencies {
     implementation libs.kotlin.logging
     implementation libs.spring.boot.starter.validation
     implementation libs.spring.boot.starter.security
+    implementation libs.spring.boot.starter.security.resource.server
     implementation libs.flyway
     implementation libs.flyway.postgresql
+
     developmentOnly libs.spring.boot.docker.compose
     runtimeOnly libs.postgresql
 
@@ -65,7 +67,7 @@ allOpen {
     annotation 'jakarta.persistence.Embeddable'
 }
 
-tasks.test  {
+tasks.test {
     useJUnitPlatform()
     maxParallelForks = 1
     forkEvery = 0

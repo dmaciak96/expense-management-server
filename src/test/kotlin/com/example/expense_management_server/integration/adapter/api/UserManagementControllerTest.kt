@@ -90,7 +90,7 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.get()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -103,7 +103,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.get()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(user.email, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        user.email,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .exchange()
             .expectStatus().isOk
             .expectBody<UserResponse>()
@@ -128,7 +135,7 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.get()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .exchange()
             .expectStatus().isOk
             .expectBody<UserResponse>()
@@ -168,7 +175,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .body(
                 UserRequest(
                     email = updatedEmail,
@@ -193,13 +207,14 @@ class UserManagementControllerTest : IntegrationTest() {
 
         restTestClient.get()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
-            .exchange()
-            .expectStatus().isUnauthorized
-
-        restTestClient.get()
-            .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(updatedEmail, updatedPassword) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        updatedEmail,
+                        updatedPassword
+                    )
+                )
+            }
             .exchange()
             .expectStatus().isOk
     }
@@ -214,7 +229,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .body(
                 UserRequest(
                     email = updatedEmail,
@@ -247,7 +269,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .body(
                 UserRequest(
                     email = updatedEmail,
@@ -280,7 +309,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .body(
                 UserRequest(
                     email = updatedEmail,
@@ -307,7 +343,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .body(
                 UserRequest(
                     email = VALID_EMAIL,
@@ -332,7 +375,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .body(
                 UserRequest(
                     email = VALID_EMAIL,
@@ -361,7 +411,7 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .body(
                 UserRequest(
                     email = updatedEmail,
@@ -384,7 +434,7 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.put()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .body(
                 UserRequest(
                     email = updatedEmail,
@@ -416,7 +466,14 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.delete()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(VALID_EMAIL, VALID_PASSWORD) }
+            .headers {
+                it.setBearerAuth(
+                    userAuthenticationPort.authenticateAndGenerateJwtToken(
+                        VALID_EMAIL,
+                        VALID_PASSWORD
+                    )
+                )
+            }
             .exchange()
             .expectStatus().isNoContent
     }
@@ -429,7 +486,7 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.delete()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(STANDARD_USER_EMAIL, STANDARD_PASSWORD) }
+            .headers { it.setBearerAuth(standardUserOneToken) }
             .exchange()
             .expectStatus().isForbidden
     }
@@ -442,7 +499,7 @@ class UserManagementControllerTest : IntegrationTest() {
         // when & then
         restTestClient.delete()
             .uri("/users/${user.id}")
-            .headers { it.setBasicAuth(ADMIN_USER_EMAIL, ADMIN_PASSWORD) }
+            .headers { it.setBearerAuth(adminToken) }
             .exchange()
             .expectStatus().isNoContent
     }
