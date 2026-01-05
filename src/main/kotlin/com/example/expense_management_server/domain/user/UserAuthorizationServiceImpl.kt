@@ -1,32 +1,32 @@
 package com.example.expense_management_server.domain.user
 
 import com.example.expense_management_server.domain.service.UserAuthorizationService
-import com.example.expense_management_server.domain.user.port.SecurityPort
+import com.example.expense_management_server.domain.user.port.UserAuthorizationPort
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service("userAuthorizationService")
 class UserAuthorizationServiceImpl(
-    private val securityPort: SecurityPort
+    private val userAuthorizationPort: UserAuthorizationPort
 ) : UserAuthorizationService {
     override fun getCurrentLoginUserId(): UUID {
-        return securityPort.getCurrentLoginUserId()
+        return userAuthorizationPort.getCurrentLoginUserId()
     }
 
     override fun checkIfCurrentUserIsAdmin(): Boolean {
-        return securityPort.checkIfCurrentUserIsAdmin()
+        return userAuthorizationPort.checkIfCurrentUserIsAdmin()
     }
 
     override fun checkIfCurrentUserIsBalanceGroupMember(balanceGroupId: UUID): Boolean {
-        return securityPort.checkIfCurrentUserIsBalanceGroupMember(balanceGroupId)
+        return userAuthorizationPort.checkIfCurrentUserIsBalanceGroupMember(balanceGroupId)
     }
 
     override fun checkIfCurrentUserIsBalanceGroupCreator(balanceGroupId: UUID): Boolean {
-        return securityPort.checkIfCurrentUserIsBalanceGroupCreator(balanceGroupId)
+        return userAuthorizationPort.checkIfCurrentUserIsBalanceGroupCreator(balanceGroupId)
     }
 
     override fun checkIfCurrentUserIsExpenseCreator(expenseId: UUID): Boolean {
-        return securityPort.checkIfCurrentUserIsExpenseCreator(expenseId)
+        return userAuthorizationPort.checkIfCurrentUserIsExpenseCreator(expenseId)
     }
 
 }

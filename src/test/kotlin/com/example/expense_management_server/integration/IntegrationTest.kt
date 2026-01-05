@@ -4,6 +4,7 @@ import com.example.expense_management_server.adapter.persistence.model.UserEntit
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
 import com.example.expense_management_server.domain.user.model.AccountStatus
 import com.example.expense_management_server.domain.user.model.UserRole
+import com.example.expense_management_server.domain.user.port.UserAuthenticationPort
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +17,6 @@ import org.springframework.test.web.servlet.client.RestTestClient
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.OffsetDateTime
 
-//@Testcontainers
 @AutoConfigureRestTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class IntegrationTest {
@@ -29,6 +29,13 @@ abstract class IntegrationTest {
 
     @Autowired
     protected lateinit var userRepository: UserRepository
+
+    @Autowired
+    protected lateinit var userAuthenticationPort: UserAuthenticationPort
+
+    protected lateinit var standardUserOneToken: String
+    protected lateinit var standardUserTwoToken: String
+    protected lateinit var adminToken: String
 
     @BeforeEach
     fun createUsers() {
@@ -76,6 +83,12 @@ abstract class IntegrationTest {
                 accountStatus = AccountStatus.ACTIVE,
             )
         )
+
+        standardUserOneToken =
+            userAuthenticationPort.authenticateAndGenerateJwtToken(STANDARD_USER_EMAIL, STANDARD_PASSWORD)
+        standardUserTwoToken =
+            userAuthenticationPort.authenticateAndGenerateJwtToken(ADDITIONAL_USER_EMAIL, ADDITIONAL_USER_PASSWORD)
+        adminToken = userAuthenticationPort.authenticateAndGenerateJwtToken(ADMIN_USER_EMAIL, ADMIN_PASSWORD)
     }
 
     @AfterEach

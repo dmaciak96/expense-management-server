@@ -28,7 +28,8 @@ To run only unit tests, execute:
 
 ## Running Integration Tests
 1. Start the Docker environment - this is required because the project uses Testcontainers,
-2. Run `./gradlew test --tests com.example.expense_management_server.integration.*`
+2. Add JWT_SECRET as env variable (set some long custom value)
+3. Run `./gradlew test --tests com.example.expense_management_server.integration.*`
 
 ## Running Architecture Tests
 To run architecture tests, execute: `./gradlew test --tests com.example.expense_management_server.architecture.*`

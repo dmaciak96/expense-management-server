@@ -1,6 +1,10 @@
 spring:
   application:
     name: expense-management-server
+  security:
+    jwt:
+      secret: "local-jwt-secret"
+      issuer: "expense-management"
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres

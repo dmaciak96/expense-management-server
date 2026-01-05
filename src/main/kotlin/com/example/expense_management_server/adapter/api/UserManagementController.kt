@@ -98,7 +98,7 @@ class UserManagementController(
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
-        private const val IS_OWNER_OR_ADMIN_MATCHER = "#userId == principal.id || hasRole('ADMIN')"
+        private const val IS_OWNER_OR_ADMIN_MATCHER = "#userId.toString() == authentication.name || hasRole('ADMIN')"
     }
 }
 
