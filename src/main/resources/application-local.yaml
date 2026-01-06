@@ -3,7 +3,7 @@ spring:
     name: expense-management-server
   security:
     jwt:
-      secret: "local-jwt-secret"
+      secret: "c1cbb75a913d94290b30ec793f2de88c538716163e91d60294cba6485cc65b7e"
       issuer: "expense-management"
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
