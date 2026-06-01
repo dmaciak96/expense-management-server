@@ -1,0 +1,36 @@
+{
+	"name": "expense-management-server",
+	"version": "1.0.0",
+	"description": "NodeJS backend for expense management application",
+	"homepage": "https://github.com/dmaciak96/expense-management-server#readme",
+	"bugs": {
+		"url": "https://github.com/dmaciak96/expense-management-server/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dmaciak96/expense-management-server.git"
+	},
+	"license": "Apache-2.0",
+	"author": "Dawid Maciak",
+	"type": "module",
+	"main": "app.ts",
+	"scripts": {
+		"build": "tsc",
+		"start": "node ./dist/app.js",
+		"dev": "tsx watch ./src/app.ts",
+		"debug": "tsx watch --inspect ./src/app.ts",
+		"check": "biome check",
+		"format": "biome check --write",
+		"format:unsafe": "biome check --write --unsafe"
+	},
+	"dependencies": {
+		"dotenv": "17.4.2",
+		"express": "5.2.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.16",
+		"@types/express": "5.0.6",
+		"@types/node": "25.9.1",
+		"tsx": "4.22.4"
+	}
+}
