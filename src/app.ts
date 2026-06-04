@@ -1,6 +1,6 @@
 import express from "express";
+import { helloRouter } from "./api/helloController.js";
 import { config } from "./config/config.js";
-import { helloRouter } from "./routers/helloRouter.js";
 
 const app = express();
 
