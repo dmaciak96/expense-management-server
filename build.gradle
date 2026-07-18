@@ -28,11 +28,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'de.codecentric:spring-boot-admin-starter-server'
-	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	implementation 'tools.jackson.module:jackson-module-kotlin'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation 'tools.jackson.module:jackson-module-kotlin'
+	implementation 'io.github.oshai:kotlin-logging-jvm:8.0.4'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
