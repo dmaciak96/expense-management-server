@@ -8,23 +8,20 @@ import jakarta.validation.constraints.NotBlank
 import java.time.Instant
 import java.util.*
 
-data class ApplicationUserRegistrationHttpRequest(
-
+data class ApplicationUserUpdateHttpRequest(
     @NotBlank
-    @Min(2)
     val firstName: String,
 
     @NotBlank
-    @Min(2)
     val lastName: String,
-
-    @Email
-    @NotBlank
-    val email: String,
 
     @NotBlank
     @Min(6)
     val password: String,
+
+    @Email
+    @NotBlank
+    val email: String,
 
     val phoneNumber: String?,
     val displayName: String?,
@@ -34,13 +31,13 @@ data class ApplicationUserRegistrationHttpRequest(
         id = UUID.randomUUID(),
         createdAt = Instant.now(),
         lastUpdatedAt = Instant.now(),
-        firstName = firstName.trim(),
-        lastName = lastName.trim(),
-        email = email.trim(),
-        phoneNumber = phoneNumber?.trim(),
-        password = password.trim(),
-        displayName = displayName?.trim(),
-        avatarUrl = avatarUrl?.trim(),
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        phoneNumber = phoneNumber,
+        password = password,
+        displayName = displayName,
+        avatarUrl = avatarUrl,
         status = ApplicationUserStatus.ACTIVE
     )
 }
