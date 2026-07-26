@@ -1,3 +1,6 @@
 spring:
   application:
     name: expense-management-server
+  threads:
+    virtual:
+      enabled: true
