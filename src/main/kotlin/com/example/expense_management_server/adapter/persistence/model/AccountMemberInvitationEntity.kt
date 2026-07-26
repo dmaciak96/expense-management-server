@@ -11,10 +11,10 @@ import java.util.*
 
 @Document
 data class AccountMemberInvitationEntity(
-    @Id val id: UUID,
+    @Id val id: String,
     @CreatedDate val createdAt: Instant,
     @CreatedBy val createdBy: ApplicationUserEntity,
-    val accountId: UUID,
+    val accountId: String,
     val email: String,
     val token: String,
     val expiresAt: Instant,
@@ -22,10 +22,10 @@ data class AccountMemberInvitationEntity(
     val status: AccountMemberInvitationStatus
 ) {
     fun toDomain() = AccountMemberInvitation(
-        id = this.id,
+        id = UUID.fromString(this.id),
         createdAt = this.createdAt,
         createdBy = this.createdBy.toDomain(),
-        accountId = this.accountId,
+        accountId = UUID.fromString(this.accountId),
         email = this.email,
         token = this.token,
         expiresAt = this.expiresAt,
@@ -35,10 +35,10 @@ data class AccountMemberInvitationEntity(
 
     companion object {
         fun fromDomain(domain: AccountMemberInvitation) = AccountMemberInvitationEntity(
-            id = domain.id,
+            id = domain.id.toString(),
             createdAt = domain.createdAt,
             createdBy = ApplicationUserEntity.fromDomain(domain.createdBy),
-            accountId = domain.accountId,
+            accountId = domain.accountId.toString(),
             email = domain.email,
             token = domain.token,
             expiresAt = domain.expiresAt,

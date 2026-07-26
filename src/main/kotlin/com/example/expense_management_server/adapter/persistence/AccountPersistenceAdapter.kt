@@ -93,7 +93,7 @@ class AccountPersistenceAdapter(
 
         LOGGER.debug { "Removing expense $expenseId from account: ${accountEntity.toDomain()}" }
         val newExpensesSet = accountEntity.expenses.toMutableSet()
-        val isRemoved = newExpensesSet.removeIf { it.id == expenseId }
+        val isRemoved = newExpensesSet.removeIf { it.id == expenseId.toString() }
         if (!isRemoved) {
             throw ExpenseNotFoundException("Expense not found with specified ID: $expenseId")
         }
@@ -127,7 +127,7 @@ class AccountPersistenceAdapter(
 
         LOGGER.debug { "Removing account member $userId from account: ${accountEntity.toDomain()}" }
         val newMembersSet = accountEntity.members.toMutableSet()
-        val isRemoved = newMembersSet.removeIf { it.applicationUserId == userId }
+        val isRemoved = newMembersSet.removeIf { it.applicationUserId == userId.toString() }
         if (!isRemoved) {
             throw AccountMemberNotFoundException("Account member not found with specified ID: $userId")
         }

@@ -13,7 +13,7 @@ import java.util.*
 
 @Document
 data class AccountEntity(
-    @Id val id: UUID,
+    @Id val id: String,
     @CreatedDate val createdAt: Instant,
     @LastModifiedDate val lastUpdatedAt: Instant,
     @CreatedBy val createdBy: ApplicationUserEntity,
@@ -24,7 +24,7 @@ data class AccountEntity(
     val status: AccountStatus,
 ) {
     fun toDomain() = Account(
-        id = this.id,
+        id = UUID.fromString(this.id),
         createdAt = this.createdAt,
         lastUpdatedAt = this.lastUpdatedAt,
         createdBy = this.createdBy.toDomain(),
@@ -37,7 +37,7 @@ data class AccountEntity(
 
     companion object {
         fun fromDomain(domain: Account) = AccountEntity(
-            id = domain.id,
+            id = domain.id.toString(),
             createdAt = domain.createdAt,
             lastUpdatedAt = domain.lastUpdatedAt,
             createdBy = ApplicationUserEntity.fromDomain(domain.createdBy),

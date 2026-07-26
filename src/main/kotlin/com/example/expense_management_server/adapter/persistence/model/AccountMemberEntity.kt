@@ -4,14 +4,14 @@ import com.example.expense_management_server.domain.account.model.AccountMember
 import java.util.*
 
 data class AccountMemberEntity(
-    val applicationUserId: UUID,
+    val applicationUserId: String,
     val firstName: String,
     val lastName: String,
     val displayName: String?,
     val avatarUrl: String?,
 ) {
     fun toDomain() = AccountMember(
-        applicationUserId = this.applicationUserId,
+        applicationUserId = UUID.fromString(this.applicationUserId),
         firstName = this.firstName,
         lastName = this.lastName,
         displayName = this.displayName,
@@ -20,7 +20,7 @@ data class AccountMemberEntity(
 
     companion object {
         fun fromDomain(domain: AccountMember) = AccountMemberEntity(
-            applicationUserId = domain.applicationUserId,
+            applicationUserId = domain.applicationUserId.toString(),
             firstName = domain.firstName,
             lastName = domain.lastName,
             displayName = domain.displayName,

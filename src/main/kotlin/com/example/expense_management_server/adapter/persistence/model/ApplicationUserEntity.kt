@@ -11,7 +11,7 @@ import java.util.*
 
 @Document
 data class ApplicationUserEntity(
-    @Id val id: UUID,
+    @Id val id: String,
     @CreatedDate val createdAt: Instant,
     @LastModifiedDate val lastUpdatedAt: Instant,
     val firstName: String,
@@ -24,7 +24,7 @@ data class ApplicationUserEntity(
     val status: ApplicationUserStatus,
 ) {
     fun toDomain() = ApplicationUser(
-        id = this.id,
+        id = UUID.fromString(this.id),
         createdAt = this.createdAt,
         lastUpdatedAt = this.lastUpdatedAt,
         firstName = this.firstName,
@@ -39,7 +39,7 @@ data class ApplicationUserEntity(
 
     companion object {
         fun fromDomain(domain: ApplicationUser) = ApplicationUserEntity(
-            id = domain.id,
+            id = domain.id.toString(),
             createdAt = domain.createdAt,
             lastUpdatedAt = domain.lastUpdatedAt,
             firstName = domain.firstName,
