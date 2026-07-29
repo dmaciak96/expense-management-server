@@ -11,7 +11,7 @@ import java.util.*
 
 @Document
 data class ExpenseEntity(
-    @Id val id: UUID,
+    @Id val id: String,
     @CreatedDate val createdAt: Instant,
     @LastModifiedDate val lastUpdatedAt: Instant,
     @CreatedBy val createdBy: ApplicationUserEntity,
@@ -20,7 +20,7 @@ data class ExpenseEntity(
     val monetaryAmount: Long
 ) {
     fun toDomain() = Expense(
-        id = this.id,
+        id = UUID.fromString(this.id),
         createdAt = this.createdAt,
         lastUpdatedAt = this.lastUpdatedAt,
         createdBy = this.createdBy.toDomain(),
@@ -31,7 +31,7 @@ data class ExpenseEntity(
 
     companion object {
         fun fromDomain(domain: Expense) = ExpenseEntity(
-            id = domain.id,
+            id = domain.id.toString(),
             createdAt = domain.createdAt,
             lastUpdatedAt = domain.lastUpdatedAt,
             createdBy = ApplicationUserEntity.fromDomain(domain.createdBy),

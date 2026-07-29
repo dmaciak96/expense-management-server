@@ -30,6 +30,7 @@ dependencies {
 	implementation 'de.codecentric:spring-boot-admin-starter-server'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation "org.springframework.boot:spring-boot-starter-security"
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
@@ -38,6 +39,7 @@ dependencies {
 	implementation 'io.github.oshai:kotlin-logging-jvm:8.0.4'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+	testImplementation 'org.mockito.kotlin:mockito-kotlin:5.4.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'

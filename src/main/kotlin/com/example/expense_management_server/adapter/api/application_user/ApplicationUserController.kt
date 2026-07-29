@@ -3,10 +3,13 @@ package com.example.expense_management_server.adapter.api.application_user
 import com.example.expense_management_server.adapter.api.application_user.model.ApplicationUserHttpResponse
 import com.example.expense_management_server.adapter.api.application_user.model.ApplicationUserRegistrationHttpRequest
 import com.example.expense_management_server.adapter.api.application_user.model.ApplicationUserUpdateHttpRequest
+import com.example.expense_management_server.application.application_user.FetchCurrentLoginUserUseCase
+import com.example.expense_management_server.application.application_user.FetchUserByEmailUseCase
+import com.example.expense_management_server.application.application_user.RemoveCurrentLoginUserUseCase
+import com.example.expense_management_server.application.application_user.UpdateUserDataUseCase
 import com.example.expense_management_server.application.application_user.UserRegistrationUseCase
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,7 +24,11 @@ import java.util.*
 @RestController
 @RequestMapping("/users")
 class ApplicationUserController(
-    private val userRegistrationUseCase: UserRegistrationUseCase
+    private val fetchCurrentLoginUserUseCase: FetchCurrentLoginUserUseCase,
+    private val fetchUserByEmailUseCase: FetchUserByEmailUseCase,
+    private val userRegistrationUseCase: UserRegistrationUseCase,
+    private val removeCurrentLoginUserUseCase: RemoveCurrentLoginUserUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase
 ) {
 
     @PostMapping
@@ -33,25 +40,28 @@ class ApplicationUserController(
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun removeCurrentLoginUser(): ResponseEntity<Void> {
-        throw NotImplementedError()
+    fun removeCurrentLoginUser() {
+        removeCurrentLoginUserUseCase.execute()
     }
 
     @PutMapping("/{id}")
     fun updateUserData(
         @PathVariable id: UUID,
         @Valid @RequestBody updateRequest: ApplicationUserUpdateHttpRequest
-    ): ResponseEntity<ApplicationUserHttpResponse> {
-        throw NotImplementedError()
+    ): ApplicationUserHttpResponse {
+        val updatedUser = updateUserDataUseCase.execute(updateRequest.toDomain().copy(id = id))
+        return ApplicationUserHttpResponse.fromDomain(updatedUser)
     }
 
     @GetMapping
-    fun getCurrentLoginUser(): ResponseEntity<ApplicationUserHttpResponse> {
-        throw NotImplementedError()
+    fun getCurrentLoginUser(): ApplicationUserHttpResponse {
+        val currentUser = fetchCurrentLoginUserUseCase.execute()
+        return ApplicationUserHttpResponse.fromDomain(currentUser)
     }
 
     @GetMapping("/{email}")
-    fun getUserByEmail(@PathVariable email: String): ResponseEntity<ApplicationUserHttpResponse> {
-        throw NotImplementedError()
+    fun getUserByEmail(@PathVariable email: String): ApplicationUserHttpResponse {
+        val user = fetchUserByEmailUseCase.execute(email)
+        return ApplicationUserHttpResponse.fromDomain(user)
     }
 }

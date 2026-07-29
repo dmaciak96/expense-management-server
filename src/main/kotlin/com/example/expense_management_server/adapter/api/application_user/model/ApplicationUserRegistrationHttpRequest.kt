@@ -3,19 +3,19 @@ package com.example.expense_management_server.adapter.api.application_user.model
 import com.example.expense_management_server.domain.application_user.model.ApplicationUser
 import com.example.expense_management_server.domain.application_user.model.ApplicationUserStatus
 import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import java.time.Instant
 import java.util.*
 
 data class ApplicationUserRegistrationHttpRequest(
 
     @NotBlank
-    @Min(2)
+    @Size(min = 2)
     val firstName: String,
 
     @NotBlank
-    @Min(2)
+    @Size(min = 2)
     val lastName: String,
 
     @Email
@@ -23,7 +23,7 @@ data class ApplicationUserRegistrationHttpRequest(
     val email: String,
 
     @NotBlank
-    @Min(6)
+    @Size(min = 6)
     val password: String,
 
     val phoneNumber: String?,

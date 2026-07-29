@@ -8,9 +8,9 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.*
 
 class UserPersistenceAdapterTest {
@@ -22,7 +22,7 @@ class UserPersistenceAdapterTest {
     fun `when proper domain object was provided then should create new user`() {
         // given
         val expected = ApplicationUserEntity.fromDomain(TestConstants.APPLICATION_USER_ONE)
-        `when`(userRepository.save(expected)).thenReturn(
+        whenever(userRepository.save(expected)).thenReturn(
             expected
         )
 
@@ -37,7 +37,7 @@ class UserPersistenceAdapterTest {
     @Test
     fun `when user with provided e-mail does not exists then should throw UserNotFoundException`() {
         // given
-        `when`(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL)).thenReturn(null)
+        whenever(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL)).thenReturn(null)
 
         // when & then
         assertThrows<UserNotFoundException> {
@@ -49,7 +49,7 @@ class UserPersistenceAdapterTest {
     @Test
     fun `when user with provided id does not exists then should throw UserNotFoundException`() {
         // given
-        `when`(userRepository.findById(TestConstants.USER_ONE_ID)).thenReturn(Optional.empty())
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(Optional.empty())
 
         // when & then
         assertThrows<UserNotFoundException> {
@@ -60,7 +60,7 @@ class UserPersistenceAdapterTest {
     @Test
     fun `when user with provided e-mail exists then should return user`() {
         // given
-        `when`(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL)).thenReturn(
+        whenever(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL)).thenReturn(
             ApplicationUserEntity.fromDomain(
                 TestConstants.APPLICATION_USER_ONE
             )
@@ -78,7 +78,7 @@ class UserPersistenceAdapterTest {
     @Test
     fun `when user with provided id exists then should return user`() {
         // given
-        `when`(userRepository.findById(TestConstants.USER_ONE_ID)).thenReturn(
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(
             Optional.of(
                 ApplicationUserEntity.fromDomain(
                     TestConstants.APPLICATION_USER_ONE
@@ -97,14 +97,14 @@ class UserPersistenceAdapterTest {
     fun `when user exists and provided proper data then should update user`() {
         // given
         val expected = TestConstants.APPLICATION_USER_TWO.copy(id = TestConstants.USER_ONE_ID)
-        `when`(userRepository.findById(TestConstants.USER_ONE_ID)).thenReturn(
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(
             Optional.of(
                 ApplicationUserEntity.fromDomain(
                     TestConstants.APPLICATION_USER_ONE
                 )
             )
         )
-        `when`(userRepository.save(ApplicationUserEntity.fromDomain(expected))).thenReturn(
+        whenever(userRepository.save(ApplicationUserEntity.fromDomain(expected))).thenReturn(
             ApplicationUserEntity.fromDomain(
                 expected
             )
@@ -115,7 +115,7 @@ class UserPersistenceAdapterTest {
             userPersistenceAdapter.update(TestConstants.APPLICATION_USER_TWO.copy(id = TestConstants.USER_ONE_ID))
 
         // then
-        verify(userRepository).findById(expected.id)
+        verify(userRepository).findById(expected.id.toString())
         verify(userRepository).save(ApplicationUserEntity.fromDomain(expected))
         assertThat(result, equalTo(expected))
     }
@@ -123,7 +123,7 @@ class UserPersistenceAdapterTest {
     @Test
     fun `when user not exists during update then should throws UserNotFoundException`() {
         // given
-        `when`(userRepository.findById(TestConstants.USER_ONE_ID)).thenReturn(Optional.empty())
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(Optional.empty())
 
         // when & then
         assertThrows<UserNotFoundException> {
@@ -134,7 +134,7 @@ class UserPersistenceAdapterTest {
     @Test
     fun `when user exists with provided id then should delete user data`() {
         // given
-        `when`(userRepository.findById(TestConstants.USER_ONE_ID)).thenReturn(
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(
             Optional.of(
                 ApplicationUserEntity.fromDomain(
                     TestConstants.APPLICATION_USER_ONE
@@ -146,14 +146,14 @@ class UserPersistenceAdapterTest {
         userPersistenceAdapter.deleteById(TestConstants.USER_ONE_ID)
 
         // then
-        verify(userRepository).findById(TestConstants.USER_ONE_ID)
-        verify(userRepository).deleteById(TestConstants.USER_ONE_ID)
+        verify(userRepository).findById(TestConstants.USER_ONE_ID.toString())
+        verify(userRepository).deleteById(TestConstants.USER_ONE_ID.toString())
     }
 
     @Test
     fun `when user not exists with provided id then should throws UserNotFoundException`() {
         // given
-        `when`(userRepository.findById(TestConstants.USER_ONE_ID)).thenReturn(Optional.empty())
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(Optional.empty())
 
         // when & then
         assertThrows<UserNotFoundException> {

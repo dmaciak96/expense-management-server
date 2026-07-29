@@ -37,7 +37,7 @@ class AccountPersistenceAdapter(
     }
 
     override fun findById(id: UUID): Account {
-        return accountRepository.findById(id)
+        return accountRepository.findById(id.toString())
             .map {
                 val domain = it.toDomain()
                 LOGGER.debug { "Account founded by it's ID: $domain" }
@@ -48,12 +48,12 @@ class AccountPersistenceAdapter(
 
     override fun findAllByCreatorId(userId: UUID): List<Account> {
         LOGGER.debug { "Searching accounts created by user: $userId" }
-        return accountRepository.findAllByCreatedById(userId)
+        return accountRepository.findAllByCreatedById(userId.toString())
             .map { it.toDomain() }
     }
 
     override fun update(account: Account): Account {
-        accountRepository.findById(account.id)
+        accountRepository.findById(account.id.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: ${account.id}") }
         LOGGER.debug { "Updating account in DB with new data: $account" }
         val updatedEntity = accountRepository.save(AccountEntity.fromDomain(account))
@@ -63,10 +63,10 @@ class AccountPersistenceAdapter(
     }
 
     override fun deleteById(id: UUID) {
-        accountRepository.findById(id)
+        accountRepository.findById(id.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: $id") }
         LOGGER.debug { "Deleting account $id from DB" }
-        accountRepository.deleteById(id)
+        accountRepository.deleteById(id.toString())
         LOGGER.debug { "Account $id was deleted" }
     }
 
@@ -74,7 +74,7 @@ class AccountPersistenceAdapter(
         expense: Expense,
         accountId: UUID
     ): Account {
-        val accountEntity = accountRepository.findById(accountId)
+        val accountEntity = accountRepository.findById(accountId.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: $accountId") }
         LOGGER.debug { "Adding expense $expense to account: ${accountEntity.toDomain()}" }
         val newExpensesSet = accountEntity.expenses + ExpenseEntity.fromDomain(expense)
@@ -88,12 +88,12 @@ class AccountPersistenceAdapter(
         accountId: UUID,
         expenseId: UUID
     ): Account {
-        val accountEntity = accountRepository.findById(accountId)
+        val accountEntity = accountRepository.findById(accountId.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: $accountId") }
 
         LOGGER.debug { "Removing expense $expenseId from account: ${accountEntity.toDomain()}" }
         val newExpensesSet = accountEntity.expenses.toMutableSet()
-        val isRemoved = newExpensesSet.removeIf { it.id == expenseId }
+        val isRemoved = newExpensesSet.removeIf { it.id == expenseId.toString() }
         if (!isRemoved) {
             throw ExpenseNotFoundException("Expense not found with specified ID: $expenseId")
         }
@@ -107,7 +107,7 @@ class AccountPersistenceAdapter(
         accountId: UUID,
         accountMember: AccountMember
     ): Account {
-        val accountEntity = accountRepository.findById(accountId)
+        val accountEntity = accountRepository.findById(accountId.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: $accountId") }
 
         LOGGER.debug { "Adding account member $accountMember. to account: ${accountEntity.toDomain()}" }
@@ -122,12 +122,12 @@ class AccountPersistenceAdapter(
         accountId: UUID,
         userId: UUID
     ): Account {
-        val accountEntity = accountRepository.findById(accountId)
+        val accountEntity = accountRepository.findById(accountId.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: $accountId") }
 
         LOGGER.debug { "Removing account member $userId from account: ${accountEntity.toDomain()}" }
         val newMembersSet = accountEntity.members.toMutableSet()
-        val isRemoved = newMembersSet.removeIf { it.applicationUserId == userId }
+        val isRemoved = newMembersSet.removeIf { it.applicationUserId == userId.toString() }
         if (!isRemoved) {
             throw AccountMemberNotFoundException("Account member not found with specified ID: $userId")
         }

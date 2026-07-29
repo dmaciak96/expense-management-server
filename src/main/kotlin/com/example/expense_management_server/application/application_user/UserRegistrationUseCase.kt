@@ -1,7 +1,7 @@
 package com.example.expense_management_server.application.application_user
 
 import com.example.expense_management_server.domain.application_user.model.ApplicationUser
-import com.example.expense_management_server.domain.application_user.port.PasswordEncoderPort
+import com.example.expense_management_server.domain.authentication.port.PasswordEncoderPort
 import com.example.expense_management_server.domain.application_user.port.UserPersistencePort
 import com.example.expense_management_server.domain.application_user.port.UserValidationPort
 import io.github.oshai.kotlinlogging.KotlinLogging
