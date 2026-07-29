@@ -39,6 +39,7 @@ dependencies {
 	implementation 'io.github.oshai:kotlin-logging-jvm:8.0.4'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+	testImplementation 'org.mockito.kotlin:mockito-kotlin:5.4.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'

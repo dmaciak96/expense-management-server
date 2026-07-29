@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface AccountRepository: CrudRepository<AccountEntity, UUID> {
+interface AccountRepository: CrudRepository<AccountEntity, String> {
     fun findByName(name: String): AccountEntity?
-    fun findAllByCreatedById(userId: UUID): List<AccountEntity>
+    fun findAllByCreatedById(userId: String): List<AccountEntity>
 }

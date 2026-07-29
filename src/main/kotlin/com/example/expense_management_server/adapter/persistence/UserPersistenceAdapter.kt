@@ -31,7 +31,7 @@ class UserPersistenceAdapter(
     }
 
     override fun findById(id: UUID): ApplicationUser {
-        return userRepository.findById(id)
+        return userRepository.findById(id.toString())
             .map {
                 val domain = it.toDomain()
                 LOGGER.debug { "User founded by it's ID: $domain" }
@@ -41,7 +41,7 @@ class UserPersistenceAdapter(
     }
 
     override fun update(user: ApplicationUser): ApplicationUser {
-        userRepository.findById(user.id)
+        userRepository.findById(user.id.toString())
             .orElseThrow { UserNotFoundException("User not found with specified ID: ${user.id}") }
         LOGGER.debug { "Updating user in DB with new data: $user" }
         val updatedEntity = userRepository.save(ApplicationUserEntity.fromDomain(user))
@@ -51,10 +51,10 @@ class UserPersistenceAdapter(
     }
 
     override fun deleteById(id: UUID) {
-        userRepository.findById(id)
+        userRepository.findById(id.toString())
             .orElseThrow { UserNotFoundException("User not found with specified ID: $id") }
         LOGGER.debug { "Deleting user $id from DB" }
-        userRepository.deleteById(id)
+        userRepository.deleteById(id.toString())
         LOGGER.debug { "User $id was deleted" }
     }
 

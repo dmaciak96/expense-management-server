@@ -1,16 +1,17 @@
 package com.example.expense_management_server.application.application_user
 
 import com.example.expense_management_server.TestConstants
-import com.example.expense_management_server.domain.authentication.port.PasswordEncoderPort
 import com.example.expense_management_server.domain.application_user.port.UserPersistencePort
 import com.example.expense_management_server.domain.application_user.port.UserValidationPort
+import com.example.expense_management_server.domain.authentication.port.PasswordEncoderPort
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.doNothing
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+
 
 class UserRegistrationUseCaseTest {
     private val userValidationPortOne: UserValidationPort = mock()
@@ -29,8 +30,8 @@ class UserRegistrationUseCaseTest {
         // given
         doNothing().`when`(userValidationPortOne).validate(TestConstants.APPLICATION_USER_ONE)
         doNothing().`when`(userValidationPortTwo).validate(TestConstants.APPLICATION_USER_ONE)
-        `when`(userPersistencePort.create(TestConstants.APPLICATION_USER_ONE)).thenReturn(TestConstants.APPLICATION_USER_ONE)
-        `when`(passwordEncoderPort.encode(TestConstants.USER_ONE_PASSWORD)).thenReturn(TestConstants.USER_ONE_PASSWORD)
+        whenever(userPersistencePort.create(TestConstants.APPLICATION_USER_ONE)).thenReturn(TestConstants.APPLICATION_USER_ONE)
+        whenever(passwordEncoderPort.encode(TestConstants.USER_ONE_PASSWORD)).thenReturn(TestConstants.USER_ONE_PASSWORD)
 
         // when
         val result = userRegistrationUseCase.execute(TestConstants.APPLICATION_USER_ONE)

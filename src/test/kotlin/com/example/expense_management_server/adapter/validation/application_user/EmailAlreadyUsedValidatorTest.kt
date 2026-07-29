@@ -8,9 +8,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+
 
 class EmailAlreadyUsedValidatorTest {
 
@@ -20,7 +21,7 @@ class EmailAlreadyUsedValidatorTest {
     @Test
     fun `should accept email when user does not exist`() {
         val user = TestConstants.APPLICATION_USER_ONE.copy(email = "new-user@example.com")
-        `when`(userPersistencePort.findByEmail(user.email)).thenThrow(UserNotFoundException("User not found"))
+        whenever(userPersistencePort.findByEmail(user.email)).thenThrow(UserNotFoundException("User not found"))
 
         assertDoesNotThrow {
             validator.validate(user)
@@ -33,7 +34,7 @@ class EmailAlreadyUsedValidatorTest {
     fun `should throw exception when email is already used`() {
         val user = TestConstants.APPLICATION_USER_ONE.copy(email = "existing-user@example.com")
         val existingUser = TestConstants.APPLICATION_USER_ONE.copy(email = "existing-user@example.com")
-        `when`(userPersistencePort.findByEmail(user.email)).thenReturn(existingUser)
+        whenever(userPersistencePort.findByEmail(user.email)).thenReturn(existingUser)
 
         val exception = assertThrows(UserAlreadyExistsException::class.java) {
             validator.validate(user)
@@ -51,7 +52,7 @@ class EmailAlreadyUsedValidatorTest {
     fun `should propagate unexpected persistence exception`() {
         val user = TestConstants.APPLICATION_USER_ONE.copy(email = "user@example.com")
 
-        `when`(userPersistencePort.findByEmail(user.email)).thenThrow(IllegalStateException("Database unavailable"))
+        whenever(userPersistencePort.findByEmail(user.email)).thenThrow(IllegalStateException("Database unavailable"))
 
         val exception = assertThrows(IllegalStateException::class.java) {
             validator.validate(user)

@@ -24,7 +24,7 @@ class InvitationPersistenceAdapter(
     }
 
     override fun findById(id: UUID): AccountMemberInvitation {
-        return invitationRepository.findById(id)
+        return invitationRepository.findById(id.toString())
             .map {
                 val domain = it.toDomain()
                 LOGGER.debug { "Account invitation founded by it's ID: $domain" }
@@ -35,12 +35,12 @@ class InvitationPersistenceAdapter(
 
     override fun findAllByAccountId(accountId: UUID): List<AccountMemberInvitation> {
         LOGGER.debug { "Searching invitations by account ID: $accountId" }
-        return invitationRepository.findAllByAccountId(accountId)
+        return invitationRepository.findAllByAccountId(accountId.toString())
             .map { it.toDomain() }
     }
 
     override fun updateStatus(id: UUID, newStatus: AccountMemberInvitationStatus): AccountMemberInvitation {
-        val invitation = invitationRepository.findById(id)
+        val invitation = invitationRepository.findById(id.toString())
             .orElseThrow { InvitationNotFoundException("Invitation not found with specified ID: $id") }
         LOGGER.debug { "Updating invitation status from ${invitation.status} to $newStatus" }
         val updatedEntity = invitationRepository.save(invitation.copy(status = newStatus))
@@ -50,10 +50,10 @@ class InvitationPersistenceAdapter(
     }
 
     override fun deleteById(id: UUID) {
-        invitationRepository.findById(id)
+        invitationRepository.findById(id.toString())
             .orElseThrow { InvitationNotFoundException("Invitation not found with specified ID: $id") }
         LOGGER.debug { "Deleting invitation $id from DB" }
-        invitationRepository.deleteById(id)
+        invitationRepository.deleteById(id.toString())
         LOGGER.debug { "Invitation $id was deleted" }
     }
 

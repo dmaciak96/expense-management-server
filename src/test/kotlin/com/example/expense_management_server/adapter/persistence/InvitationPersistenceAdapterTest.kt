@@ -11,10 +11,10 @@ import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.collection.IsCollectionWithSize.hasSize
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.doNothing
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.*
 
 class InvitationPersistenceAdapterTest {
@@ -26,7 +26,7 @@ class InvitationPersistenceAdapterTest {
     fun `when provide proper domain model then should create account invitation`() {
         // given
         val expected = AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
-        `when`(invitationRepository.save(AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION))).thenReturn(
+        whenever(invitationRepository.save(AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION))).thenReturn(
             expected
         )
 
@@ -41,7 +41,7 @@ class InvitationPersistenceAdapterTest {
     @Test
     fun `when invitation with provided id exists then should return proper invitation object`() {
         // given
-        `when`(invitationRepository.findById(TestConstants.INVITATION_ID)).thenReturn(
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(
             Optional.of(
                 AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
             )
@@ -51,14 +51,14 @@ class InvitationPersistenceAdapterTest {
         val result = invitationPersistenceAdapter.findById(TestConstants.INVITATION_ID)
 
         // then
-        verify(invitationRepository).findById(TestConstants.INVITATION_ID)
+        verify(invitationRepository).findById(TestConstants.INVITATION_ID.toString())
         assertThat(result, equalTo(TestConstants.INVITATION))
     }
 
     @Test
     fun `when invitation with provided id not exists then should throws InvitationNotFoundException`() {
         // given
-        `when`(invitationRepository.findById(TestConstants.INVITATION_ID)).thenReturn(Optional.empty())
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(Optional.empty())
 
         // when & then
         assertThrows<InvitationNotFoundException> {
@@ -69,24 +69,24 @@ class InvitationPersistenceAdapterTest {
     @Test
     fun `when invitation exists then should delete invitation`() {
         // given
-        `when`(invitationRepository.findById(TestConstants.INVITATION_ID)).thenReturn(
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(
             Optional.of(
                 AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
             )
         )
-        doNothing().`when`(invitationRepository).deleteById(TestConstants.INVITATION_ID)
+        doNothing().`when`(invitationRepository).deleteById(TestConstants.INVITATION_ID.toString())
 
         // when
         invitationPersistenceAdapter.deleteById(TestConstants.INVITATION_ID)
 
         // then
-        verify(invitationRepository).deleteById(TestConstants.INVITATION_ID)
+        verify(invitationRepository).deleteById(TestConstants.INVITATION_ID.toString())
     }
 
     @Test
     fun `when invitation not exists during deletion then should throws InvitationNotFoundException`() {
         // given
-        `when`(invitationRepository.findById(TestConstants.INVITATION_ID)).thenReturn(Optional.empty())
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(Optional.empty())
 
         // when & then
         assertThrows<InvitationNotFoundException> {
@@ -97,7 +97,7 @@ class InvitationPersistenceAdapterTest {
     @Test
     fun `when invitation not exists during update status then should throws InvitationNotFoundException`() {
         // given
-        `when`(invitationRepository.findById(TestConstants.INVITATION_ID)).thenReturn(Optional.empty())
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(Optional.empty())
 
         // when & then
         assertThrows<InvitationNotFoundException> {
@@ -112,12 +112,12 @@ class InvitationPersistenceAdapterTest {
     fun `when correct status and invitation id then should update invitation status`() {
         // given
         val expected = TestConstants.INVITATION.copy(status = AccountMemberInvitationStatus.REJECTED)
-        `when`(invitationRepository.findById(TestConstants.INVITATION_ID)).thenReturn(
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(
             Optional.of(
                 AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
             )
         )
-        `when`(invitationRepository.save(AccountMemberInvitationEntity.fromDomain(expected))).thenReturn(
+        whenever(invitationRepository.save(AccountMemberInvitationEntity.fromDomain(expected))).thenReturn(
             AccountMemberInvitationEntity.fromDomain(expected)
         )
 
@@ -128,7 +128,7 @@ class InvitationPersistenceAdapterTest {
         )
 
         // then
-        verify(invitationRepository).findById(TestConstants.INVITATION_ID)
+        verify(invitationRepository).findById(TestConstants.INVITATION_ID.toString())
         verify(invitationRepository).save(AccountMemberInvitationEntity.fromDomain(expected))
         assertThat(result, equalTo(expected))
     }
@@ -136,14 +136,14 @@ class InvitationPersistenceAdapterTest {
     @Test
     fun `when invitation exists by accountID then should return proper list`() {
         // given
-        `when`(invitationRepository.findAllByAccountId(TestConstants.ACCOUNT_ID))
+        whenever(invitationRepository.findAllByAccountId(TestConstants.ACCOUNT_ID.toString()))
             .thenReturn(listOf(AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)))
 
         // when
         val result = invitationPersistenceAdapter.findAllByAccountId(TestConstants.ACCOUNT_ID)
 
         // then
-        verify(invitationRepository).findAllByAccountId(TestConstants.ACCOUNT_ID)
+        verify(invitationRepository).findAllByAccountId(TestConstants.ACCOUNT_ID.toString())
         assertThat(result, hasSize(1))
         assertThat(result, containsInAnyOrder(TestConstants.INVITATION))
     }
@@ -151,14 +151,14 @@ class InvitationPersistenceAdapterTest {
     @Test
     fun `when user not created account then should return empty list`() {
         // given
-        `when`(invitationRepository.findAllByAccountId(TestConstants.ACCOUNT_ID))
+        whenever(invitationRepository.findAllByAccountId(TestConstants.ACCOUNT_ID.toString()))
             .thenReturn(emptyList())
 
         // when
         val result = invitationPersistenceAdapter.findAllByAccountId(TestConstants.ACCOUNT_ID)
 
         // then
-        verify(invitationRepository).findAllByAccountId(TestConstants.ACCOUNT_ID)
+        verify(invitationRepository).findAllByAccountId(TestConstants.ACCOUNT_ID.toString())
         assertThat(result, hasSize(0))
     }
 }
