@@ -52,6 +52,15 @@ class AccountPersistenceAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findAllByMemberId(userId: UUID): List<Account> {
+        LOGGER.debug { "Searching accounts where user $userId is member" }
+        return accountRepository.findAll()
+            .filter { accountEntity ->
+                accountEntity.members.map { member -> member.applicationUserId }.contains(userId.toString())
+            }
+            .map { it.toDomain() }
+    }
+
     override fun update(account: Account): Account {
         accountRepository.findById(account.id.toString())
             .orElseThrow { AccountNotFoundException("Account not found with specified ID: ${account.id}") }
