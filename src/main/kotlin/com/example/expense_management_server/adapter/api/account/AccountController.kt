@@ -8,6 +8,7 @@ import com.example.expense_management_server.application.account.FetchAccountByI
 import com.example.expense_management_server.application.account.FetchAllAccountsUseCase
 import com.example.expense_management_server.application.account.RemoveAccountUseCase
 import com.example.expense_management_server.application.account.UpdateAccountUseCase
+import com.example.expense_management_server.application.application_user.FetchCurrentLoginUserUseCase
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -27,11 +28,13 @@ class AccountController(
     private val updateAccountUseCase: UpdateAccountUseCase,
     private val fetchAllAccountsUseCase: FetchAllAccountsUseCase,
     private val fetchAccountByIdUseCase: FetchAccountByIdUseCase,
+    private val fetchCurrentLoginUserUseCase: FetchCurrentLoginUserUseCase
 ) {
 
     @PostMapping
     fun createNewAccount(@Valid @RequestBody accountRequest: AccountCreationHttpRequest): AccountHttpResponse {
-        val createdAccount = accountCreationUseCase.execute(accountRequest.toDomain())
+        val currentUser = fetchCurrentLoginUserUseCase.execute()
+        val createdAccount = accountCreationUseCase.execute(accountRequest.toDomain(currentUser))
         return AccountHttpResponse.fromDomain(createdAccount)
     }
 
@@ -45,7 +48,8 @@ class AccountController(
         @PathVariable id: UUID,
         @Valid @RequestBody accountRequest: AccountUpdateHttpRequest
     ): AccountHttpResponse {
-        val updatedAccount = updateAccountUseCase.execute(accountRequest.toDomain(id))
+        val currentUser = fetchCurrentLoginUserUseCase.execute()
+        val updatedAccount = updateAccountUseCase.execute(accountRequest.toDomain(id, currentUser))
         return AccountHttpResponse.fromDomain(updatedAccount)
     }
 

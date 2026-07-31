@@ -8,7 +8,7 @@ data class Account(
     val id: UUID,
     val createdAt: Instant,
     val lastUpdatedAt: Instant,
-    val createdBy: ApplicationUser?,
+    val createdBy: ApplicationUser,
     val name: String,
     val currency: Currency,
     val members: Set<AccountMember>,

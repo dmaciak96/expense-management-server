@@ -1,6 +1,5 @@
 package com.example.expense_management_server.application.account
 
-import com.example.expense_management_server.application.application_user.FetchCurrentLoginUserUseCase
 import com.example.expense_management_server.domain.account.exception.AccountNotFoundException
 import com.example.expense_management_server.domain.account.exception.AccountValidationException
 import com.example.expense_management_server.domain.account.model.Account
@@ -12,19 +11,17 @@ import org.springframework.stereotype.Component
 @Component
 class UpdateAccountUseCase(
     private val accountPersistencePort: AccountPersistencePort,
-    private val fetchCurrentLoginUserUseCase: FetchCurrentLoginUserUseCase
 ) {
 
     fun execute(account: Account): Account {
-        val currentUser = fetchCurrentLoginUserUseCase.execute()
-        LOGGER.info { "Updating account ${account.id} by user ${currentUser.email}" }
+        LOGGER.info { "Updating account ${account.id} by user ${account.createdBy.email}" }
         val accountToUpdate = accountPersistencePort.findById(account.id)
-        if (isNotOwnerButIsMember(accountToUpdate, currentUser)) {
+        if (isNotOwnerButIsMember(accountToUpdate, account.createdBy)) {
             LOGGER.warn { "Account cannot be updated by it's members" }
             throw AccountValidationException("Account cannot be updated by it's members")
         }
 
-        if (isNotOwner(accountToUpdate, currentUser)) {
+        if (isNotOwner(accountToUpdate, account.createdBy)) {
             throw AccountNotFoundException("Account not found by ID ${account.id}")
         }
 
@@ -35,7 +32,7 @@ class UpdateAccountUseCase(
                 status = account.status,
             )
         )
-        LOGGER.info { "Account ${account.id} updated successfully by user ${currentUser.email}" }
+        LOGGER.info { "Account ${account.id} updated successfully by user ${account.createdBy.email}" }
         return updatedAccount
     }
 

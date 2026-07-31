@@ -12,13 +12,8 @@ class AccountCreationUseCase(
     private val fetchCurrentLoginUserUseCase: FetchCurrentLoginUserUseCase
 ) {
     fun execute(account: Account): Account {
-        val currentUser = fetchCurrentLoginUserUseCase.execute()
-        LOGGER.info { "Creating new account ${account.name} by ${currentUser.email}" }
-        val savedAccount = accountPersistencePort.create(
-            account.copy(
-                createdBy = currentUser
-            )
-        )
+        LOGGER.info { "Creating new account ${account.name} by ${account.createdBy.email}" }
+        val savedAccount = accountPersistencePort.create(account)
         LOGGER.info { "Account ${account.name} created successfully" }
         return savedAccount
     }
