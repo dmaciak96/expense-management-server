@@ -9,12 +9,14 @@ import com.example.expense_management_server.application.expense.AddExpenseToAcc
 import com.example.expense_management_server.application.expense.DeleteExpenseFromAccountUseCase
 import com.example.expense_management_server.application.expense.FetchAllExpensesFromAccount
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
@@ -29,6 +31,7 @@ class ExpenseController(
 ) {
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun addNewExpenseToAccount(
         @PathVariable accountId: UUID,
         @Valid @RequestBody expenseRequest: ExpenseHttpRequest
