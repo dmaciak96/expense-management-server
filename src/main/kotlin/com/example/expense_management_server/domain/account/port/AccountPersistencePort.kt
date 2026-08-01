@@ -10,6 +10,7 @@ interface AccountPersistencePort {
     fun findByName(name: String): Account
     fun findById(id: UUID): Account
     fun findAllByCreatorId(userId: UUID): List<Account>
+    fun findAllByMemberId(userId: UUID): List<Account>
     fun update(account: Account): Account
     fun deleteById(id: UUID)
 

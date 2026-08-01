@@ -6,11 +6,11 @@ spring:
       enabled: true
   data:
     mongodb:
-      url: mongodb://localhost:27017/expense-management
-      username: admin
-      password: password
+      url: ${DB_URL}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
 
 security:
   jwt:
-    secret: dGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldC10ZXN0LWp3dC1zZWNyZXQtdGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldA==
-    expiration: 3600
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_TOKEN_EXPIRATION_IN_SECONDS}

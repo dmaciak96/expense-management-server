@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: expense-management-server
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      url: mongodb://localhost:27017/expense-management
+      username: admin
+      password: password
+
+security:
+  jwt:
+    secret: dGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldC10ZXN0LWp3dC1zZWNyZXQtdGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldA==
+    expiration: 3600
