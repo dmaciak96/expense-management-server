@@ -1,13 +1,13 @@
-name: ci
+name: cd
 
-# The workflow runs when a pull request targets the master branch
+# The workflow runs when a push was made to master branch (PR was merged to master)
 on:
-  pull_request:
+  push:
     branches:
       - master
 
 jobs:
-  ci:
+  cd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,13 +25,12 @@ jobs:
       - name: Make Gradle Wrapper executable
         run: chmod +x gradlew
 
-      - name: Compile and run tests
-        run: ./gradlew clean test
+      - name: Build JAR
+        run: ./gradlew bootJar -x test
 
-      - name: Upload test report
-        if: failure()
+      - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: build/reports/tests/test
-          retention-days: 1
+          name: expense-management-server
+          path: build/libs/*.jar
+          retention-days: 2
