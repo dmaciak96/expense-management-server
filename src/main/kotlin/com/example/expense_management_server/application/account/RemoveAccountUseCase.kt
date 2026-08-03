@@ -17,7 +17,7 @@ class RemoveAccountUseCase(
         val currentUser = fetchCurrentLoginUserUseCase.execute()
         LOGGER.info { "Removing account by ID by user ${currentUser.email}" }
         val account = accountPersistencePort.findById(accountId)
-        if (account.createdBy != currentUser) {
+        if (account.createdBy.id != currentUser.id) {
             throw AccountNotFoundException("Account with ID $accountId not found")
         }
         accountPersistencePort.deleteById(accountId)

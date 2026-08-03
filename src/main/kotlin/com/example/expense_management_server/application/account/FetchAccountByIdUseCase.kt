@@ -19,13 +19,13 @@ class FetchAccountByIdUseCase(
         val currentUser = fetchCurrentLoginUserUseCase.execute()
         LOGGER.info { "Fetching account by ID by user ${currentUser.email}" }
         val account = accountPersistencePort.findById(id)
-        if (isNotAccountOwner(account, currentUser) || isNotAccountMember(account, currentUser)) {
+        if (isNotAccountOwner(account, currentUser) && isNotAccountMember(account, currentUser)) {
             throw AccountNotFoundException("Account with ID $id not found")
         }
         return account
     }
 
-    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy != user
+    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy.id != user.id
     private fun isNotAccountMember(account: Account, user: ApplicationUser) =
         !account.members.map { it.applicationUserId }
             .contains(user.id)
