@@ -36,10 +36,10 @@ class UpdateAccountUseCase(
         return updatedAccount
     }
 
-    private fun isNotOwner(account: Account, currentUser: ApplicationUser) = account.createdBy != currentUser
+    private fun isNotOwner(account: Account, currentUser: ApplicationUser) = account.createdBy.id != currentUser.id
 
     private fun isNotOwnerButIsMember(account: Account, currentUser: ApplicationUser) =
-        account.createdBy != currentUser && account.members.map { it.applicationUserId }.contains(currentUser.id)
+        account.createdBy.id != currentUser.id && account.members.map { it.applicationUserId }.contains(currentUser.id)
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}

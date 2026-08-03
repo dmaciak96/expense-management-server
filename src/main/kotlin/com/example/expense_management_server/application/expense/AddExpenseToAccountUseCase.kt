@@ -27,7 +27,7 @@ class AddExpenseToAccountUseCase(
         return updatedAccount
     }
 
-    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy != user
+    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy.id != user.id
     private fun isNotAccountMember(account: Account, user: ApplicationUser) =
         !account.members.map { it.applicationUserId }
             .contains(user.id)

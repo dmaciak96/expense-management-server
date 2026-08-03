@@ -45,7 +45,7 @@ class AddMemberToAccountUseCase(
         return updatedAccount
     }
 
-    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy != user
+    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy.id != user.id
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}

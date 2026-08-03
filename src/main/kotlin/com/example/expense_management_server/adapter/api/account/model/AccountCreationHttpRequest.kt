@@ -15,7 +15,6 @@ data class AccountCreationHttpRequest(
     @Size(min = 1, max = 64)
     val name: String,
 
-    @NotBlank
     val currency: Currency,
 ) {
     fun toDomain(createdBy: ApplicationUser) = Account(
