@@ -4,11 +4,8 @@ spring:
   threads:
     virtual:
       enabled: true
-  data:
-    mongodb:
-      url: mongodb://localhost:27017/expense-management
-      username: admin
-      password: password
+  mongodb:
+    uri: mongodb://admin:password@localhost:27017/expense-management?authSource=admin
 
 security:
   jwt:

@@ -4,11 +4,8 @@ spring:
   threads:
     virtual:
       enabled: true
-  data:
-    mongodb:
-      url: ${DB_URL}
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
+  mongodb:
+    uri: ${DB_URI}
 
 security:
   jwt:
