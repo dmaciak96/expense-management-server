@@ -30,7 +30,7 @@ class AddMemberToAccountUseCase(
         if (account.members.any { it.applicationUserId == applicationUserId }) {
             throw AccountValidationException("Member $applicationUserId already exists inside account $accountId")
         }
-        val user = fetchUserByIdUseCase.execute(accountId)
+        val user = fetchUserByIdUseCase.execute(applicationUserId)
         val updatedAccount = accountPersistencePort.addAccountMember(
             accountId = accountId,
             accountMember = AccountMember(
