@@ -84,7 +84,7 @@ class JwtAuthenticationAdapterTest {
         verify(jwtEncoder).encode(capture(captor))
 
         val parameters = captor.value
-        assertEquals("expense-management", parameters.claims.issuer)
+        assertEquals("expense-management", parameters.claims.getClaim<String>("iss"))
         assertEquals(userAuthentication.email, parameters.claims.subject)
         assertEquals(listOf("ROLE_USER"), parameters.claims.getClaim<List<String>>("roles"))
         assertEquals("JWT", parameters.jwsHeader?.type)
