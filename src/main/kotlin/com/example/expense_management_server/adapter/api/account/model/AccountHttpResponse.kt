@@ -6,7 +6,6 @@ import com.example.expense_management_server.adapter.api.expense.model.ExpenseHt
 import com.example.expense_management_server.domain.account.model.Account
 import com.example.expense_management_server.domain.account.model.AccountStatus
 import com.example.expense_management_server.domain.account.model.Currency
-import com.example.expense_management_server.domain.application_user.exception.UserNotFoundException
 import java.time.Instant
 import java.util.*
 
