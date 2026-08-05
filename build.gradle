@@ -22,6 +22,10 @@ ext {
 	set('springBootAdminVersion', "4.1.2")
 }
 
+configurations {
+	mockitoAgent
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
@@ -48,6 +52,10 @@ dependencies {
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 	testImplementation 'org.testcontainers:testcontainers-mongodb'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	mockitoAgent('org.mockito:mockito-core') {
+		transitive = false
+	}
 }
 
 dependencyManagement {
@@ -64,4 +72,6 @@ kotlin {
 
 tasks.named('test') {
 	useJUnitPlatform()
+
+	jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
