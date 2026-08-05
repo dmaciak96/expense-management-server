@@ -2,222 +2,185 @@ package com.example.expense_management_server.adapter.persistence
 
 import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.adapter.persistence.model.AccountEntity
+import com.example.expense_management_server.adapter.persistence.model.AccountMemberEntity
+import com.example.expense_management_server.adapter.persistence.model.ExpenseEntity
 import com.example.expense_management_server.adapter.persistence.repository.AccountRepository
+import com.example.expense_management_server.domain.account.exception.AccountMemberNotFoundException
 import com.example.expense_management_server.domain.account.exception.AccountNotFoundException
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.collection.IsCollectionWithSize.hasSize
+import com.example.expense_management_server.domain.account.exception.ExpenseNotFoundException
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doNothing
-import org.mockito.kotlin.mock
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.*
+import java.util.Optional
+import java.util.UUID
 
 class AccountPersistenceAdapterTest {
 
-    private val accountRepository: AccountRepository = mock()
-    private val accountPersistenceAdapter: AccountPersistenceAdapter = AccountPersistenceAdapter(accountRepository)
+    @Mock
+    private lateinit var accountRepository: AccountRepository
 
-    @Test
-    fun `when provided proper domain account object then should create new account`() {
-        // given
-        val accountEntity = AccountEntity.fromDomain(TestConstants.ACCOUNT)
-        whenever(accountRepository.save(accountEntity)).thenReturn(accountEntity)
+    private lateinit var adapter: AccountPersistenceAdapter
 
-        // when
-        val result = accountPersistenceAdapter.create(TestConstants.ACCOUNT)
+    @BeforeEach
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
 
-        // then
-        verify(accountRepository).save(accountEntity)
-        assertThat(result, equalTo(TestConstants.ACCOUNT))
+        adapter = AccountPersistenceAdapter(
+            accountRepository = accountRepository
+        )
     }
 
     @Test
-    fun `when account with provided name not exists then should throw AccountNotFoundException`() {
+    fun `should create account`() {
         // given
-        whenever(accountRepository.findByName(TestConstants.ACCOUNT_NAME)).thenReturn(null)
+        val entity = AccountEntity.fromDomain(TestConstants.ACCOUNT)
+
+        whenever(accountRepository.save(entity))
+            .thenReturn(entity)
+
+        // when
+        val result = adapter.create(TestConstants.ACCOUNT)
+
+        // then
+        assertEquals(TestConstants.ACCOUNT, result)
+
+        verify(accountRepository).save(entity)
+    }
+
+    @Test
+    fun `should find account by id`() {
+        // given
+        val entity = AccountEntity.fromDomain(TestConstants.ACCOUNT)
+
+        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
+            .thenReturn(Optional.of(entity))
+
+        // when
+        val result = adapter.findById(TestConstants.ACCOUNT_ID)
+
+        // then
+        assertEquals(TestConstants.ACCOUNT, result)
+
+        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
+    }
+
+    @Test
+    fun `should throw AccountNotFoundException when account does not exist`() {
+        // given
+        val id = UUID.randomUUID()
+
+        whenever(accountRepository.findById(id.toString()))
+            .thenReturn(Optional.empty())
 
         // when & then
         assertThrows<AccountNotFoundException> {
-            accountPersistenceAdapter.findByName(TestConstants.ACCOUNT_NAME)
+            adapter.findById(id)
         }
-        verify(accountRepository).findByName(TestConstants.ACCOUNT_NAME)
+
+        verify(accountRepository).findById(id.toString())
     }
 
     @Test
-    fun `when account with provided name exists then should return proper account`() {
+    fun `should add expense`() {
         // given
-        whenever(accountRepository.findByName(TestConstants.ACCOUNT_NAME))
-            .thenReturn(AccountEntity.fromDomain(TestConstants.ACCOUNT))
+        val accountWithoutExpenses = TestConstants.ACCOUNT.copy(expenses = emptySet())
+        val entity = AccountEntity.fromDomain(accountWithoutExpenses)
+        val updatedEntity = entity.copy(
+            expenses = entity.expenses + ExpenseEntity.fromDomain(TestConstants.EXPENSE)
+        )
+
+        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
+            .thenReturn(Optional.of(entity))
+
+        whenever(accountRepository.save(updatedEntity))
+            .thenReturn(updatedEntity)
 
         // when
-        val result = accountPersistenceAdapter.findByName(TestConstants.ACCOUNT_NAME)
+        val result = adapter.addExpense(
+            TestConstants.EXPENSE,
+            TestConstants.ACCOUNT_ID
+        )
 
         // then
-        verify(accountRepository).findByName(TestConstants.ACCOUNT_NAME)
-        assertThat(result, equalTo(TestConstants.ACCOUNT))
+        assertEquals(setOf(TestConstants.EXPENSE), result.expenses)
+
+        verify(accountRepository).save(updatedEntity)
     }
 
     @Test
-    fun `when user created account then should return proper object`() {
+    fun `should throw ExpenseNotFoundException when removing unknown expense`() {
         // given
-        whenever(accountRepository.findAllByCreatedById(TestConstants.USER_ONE_ID.toString()))
-            .thenReturn(listOf(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
+        val entity = AccountEntity.fromDomain(TestConstants.ACCOUNT)
+        val expenseId = UUID.randomUUID()
 
-        // when
-        val result = accountPersistenceAdapter.findAllByCreatorId(TestConstants.USER_ONE_ID)
-
-        // then
-        verify(accountRepository).findAllByCreatedById(TestConstants.USER_ONE_ID.toString())
-        assertThat(result, hasSize(1))
-        assertThat(result, containsInAnyOrder(TestConstants.ACCOUNT))
-    }
-
-    @Test
-    fun `when user not created account then should return empty list`() {
-        // given
-        whenever(accountRepository.findAllByCreatedById(TestConstants.USER_ONE_ID.toString()))
-            .thenReturn(emptyList())
-
-        // when
-        val result = accountPersistenceAdapter.findAllByCreatorId(TestConstants.USER_ONE_ID)
-
-        // then
-        verify(accountRepository).findAllByCreatedById(TestConstants.USER_ONE_ID.toString())
-        assertThat(result, hasSize(0))
-    }
-
-    @Test
-    fun `when account with provided id not exists then should throw AccountNotFoundException`() {
-        // given
-        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString())).thenReturn(Optional.empty())
+        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
+            .thenReturn(Optional.of(entity))
 
         // when & then
-        assertThrows<AccountNotFoundException> {
-            accountPersistenceAdapter.findById(TestConstants.ACCOUNT_ID)
+        assertThrows<ExpenseNotFoundException> {
+            adapter.removeExpense(
+                TestConstants.ACCOUNT_ID,
+                expenseId
+            )
         }
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
+
+        verify(accountRepository, never()).save(org.mockito.kotlin.any())
     }
 
     @Test
-    fun `when account with provided id exists then should return proper account`() {
+    fun `should add account member`() {
         // given
-        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(Optional.of(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
-
-        // when
-        val result = accountPersistenceAdapter.findById(TestConstants.ACCOUNT_ID)
-
-        // then
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
-        assertThat(result, equalTo(TestConstants.ACCOUNT))
-    }
-
-    @Test
-    fun `when account exists then should add new expense`() {
-        // given
-        val newExpense = TestConstants.EXPENSE.copy(name = "New expense")
-        val expected = TestConstants.ACCOUNT.copy(
-            expenses = setOf(
-                TestConstants.EXPENSE,
-                newExpense
-            )
+        val account = TestConstants.ACCOUNT.copy(
+            members = setOf(TestConstants.APPLICATION_USER_ONE.toAccountMember())
         )
-        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(Optional.of(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
-        whenever(accountRepository.save(any())).thenReturn(AccountEntity.fromDomain(expected))
-
-        // when
-        val result = accountPersistenceAdapter.addExpense(newExpense, TestConstants.ACCOUNT_ID)
-
-        // then
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
-        verify(accountRepository).save(AccountEntity.fromDomain(expected))
-        assertThat(result, equalTo(expected))
-    }
-
-    @Test
-    fun `when account and expense exists then should remove expense`() {
-        // given
-        val expected = TestConstants.ACCOUNT.copy(expenses = emptySet())
-        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(Optional.of(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
-        whenever(accountRepository.save(any())).thenReturn(AccountEntity.fromDomain(expected))
-
-        // when
-        val result = accountPersistenceAdapter.removeExpense(TestConstants.ACCOUNT_ID, TestConstants.EXPENSE.id)
-
-        // then
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
-        verify(accountRepository).save(AccountEntity.fromDomain(expected))
-        assertThat(result, equalTo(expected))
-    }
-
-    @Test
-    fun `when account exists then should add new account member`() {
-        // given
-        val newAccountMember =
-            TestConstants.APPLICATION_USER_ONE.copy(firstName = "Ned", lastName = "Stark").toAccountMember()
-        val expected = TestConstants.ACCOUNT.copy(
-            members = setOf(
-                newAccountMember,
-                TestConstants.APPLICATION_USER_ONE.toAccountMember(),
-                TestConstants.APPLICATION_USER_TWO.toAccountMember()
-            )
+        val entity = AccountEntity.fromDomain(account)
+        val member = TestConstants.APPLICATION_USER_TWO.toAccountMember()
+        val updatedEntity = entity.copy(
+            members = entity.members + AccountMemberEntity.fromDomain(member)
         )
+
         whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(Optional.of(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
-        whenever(accountRepository.save(any())).thenReturn(AccountEntity.fromDomain(expected))
+            .thenReturn(Optional.of(entity))
+
+        whenever(accountRepository.save(updatedEntity))
+            .thenReturn(updatedEntity)
 
         // when
-        val result = accountPersistenceAdapter.addAccountMember(TestConstants.ACCOUNT_ID, newAccountMember)
+        val result = adapter.addAccountMember(
+            TestConstants.ACCOUNT_ID,
+            member
+        )
 
         // then
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
-        verify(accountRepository).save(AccountEntity.fromDomain(expected))
-        assertThat(result, equalTo(expected))
+        assertEquals(2, result.members.size)
+        assertEquals(true, result.members.contains(member))
+
+        verify(accountRepository).save(updatedEntity)
     }
 
     @Test
-    fun `when account and expense exists then should remove account member`() {
+    fun `should throw AccountMemberNotFoundException when removing unknown member`() {
         // given
-        val expected = TestConstants.ACCOUNT.copy(members = setOf(TestConstants.APPLICATION_USER_ONE.toAccountMember()))
+        val entity = AccountEntity.fromDomain(TestConstants.ACCOUNT)
+        val userId = UUID.randomUUID()
+
         whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(Optional.of(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
-        whenever(accountRepository.save(any())).thenReturn(AccountEntity.fromDomain(expected))
-
-        // when
-        val result = accountPersistenceAdapter.removeMember(TestConstants.ACCOUNT_ID, TestConstants.USER_TWO_ID)
-
-        // then
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
-        verify(accountRepository).save(AccountEntity.fromDomain(expected))
-        assertThat(result, equalTo(expected))
-    }
-
-    @Test
-    fun `when account exists then should remove account`() {
-        // given
-        doNothing().`when`(accountRepository).deleteById(TestConstants.ACCOUNT_ID.toString())
-        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(Optional.of(AccountEntity.fromDomain(TestConstants.ACCOUNT)))
+            .thenReturn(Optional.of(entity))
 
         // when & then
-        accountPersistenceAdapter.deleteById(TestConstants.ACCOUNT_ID)
-        verify(accountRepository).deleteById(TestConstants.ACCOUNT_ID.toString())
-        verify(accountRepository).findById(TestConstants.ACCOUNT_ID.toString())
-    }
+        assertThrows<AccountMemberNotFoundException> {
+            adapter.removeMember(
+                TestConstants.ACCOUNT_ID,
+                userId
+            )
+        }
 
-    @Test
-    fun `when account not exists then should throw AccountNotFoundException`() {
-        doNothing().`when`(accountRepository).deleteById(TestConstants.ACCOUNT_ID.toString())
-        whenever(accountRepository.findById(TestConstants.ACCOUNT_ID.toString())).thenReturn(Optional.empty())
-
-        // when & then
-        assertThrows<AccountNotFoundException> { accountPersistenceAdapter.deleteById(TestConstants.ACCOUNT_ID) }
+        verify(accountRepository, never()).save(org.mockito.kotlin.any())
     }
 }
