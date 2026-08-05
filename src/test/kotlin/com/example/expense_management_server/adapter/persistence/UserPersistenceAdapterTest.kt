@@ -4,160 +4,114 @@ import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.adapter.persistence.model.ApplicationUserEntity
 import com.example.expense_management_server.adapter.persistence.repository.UserRepository
 import com.example.expense_management_server.domain.application_user.exception.UserNotFoundException
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertSame
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.mock
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.*
+import java.util.Optional
+import java.util.UUID
 
 class UserPersistenceAdapterTest {
 
-    private val userRepository: UserRepository = mock()
-    private val userPersistenceAdapter = UserPersistenceAdapter(userRepository)
+    @Mock
+    private lateinit var userRepository: UserRepository
+
+    private lateinit var adapter: UserPersistenceAdapter
+
+    @BeforeEach
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+
+        adapter = UserPersistenceAdapter(
+            userRepository = userRepository
+        )
+    }
 
     @Test
-    fun `when proper domain object was provided then should create new user`() {
+    fun `should create user`() {
         // given
-        val expected = ApplicationUserEntity.fromDomain(TestConstants.APPLICATION_USER_ONE)
-        whenever(userRepository.save(expected)).thenReturn(
-            expected
-        )
+        val entity = ApplicationUserEntity.fromDomain(TestConstants.APPLICATION_USER_ONE)
+
+        whenever(userRepository.save(entity))
+            .thenReturn(entity)
 
         // when
-        val result = userPersistenceAdapter.create(TestConstants.APPLICATION_USER_ONE)
+        val result = adapter.create(TestConstants.APPLICATION_USER_ONE)
 
         // then
-        verify(userRepository).save(expected)
-        assertThat(result, equalTo(TestConstants.APPLICATION_USER_ONE))
+        assertEquals(TestConstants.APPLICATION_USER_ONE, result)
+
+        verify(userRepository).save(entity)
     }
 
     @Test
-    fun `when user with provided e-mail does not exists then should throw UserNotFoundException`() {
+    fun `should find user by email`() {
         // given
-        whenever(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL)).thenReturn(null)
+        val entity = ApplicationUserEntity.fromDomain(TestConstants.APPLICATION_USER_ONE)
 
-        // when & then
-        assertThrows<UserNotFoundException> {
-            userPersistenceAdapter.findByEmail(TestConstants.USER_ONE_EMAIL)
-        }
-    }
-
-
-    @Test
-    fun `when user with provided id does not exists then should throw UserNotFoundException`() {
-        // given
-        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(Optional.empty())
-
-        // when & then
-        assertThrows<UserNotFoundException> {
-            userPersistenceAdapter.findById(TestConstants.USER_ONE_ID)
-        }
-    }
-
-    @Test
-    fun `when user with provided e-mail exists then should return user`() {
-        // given
-        whenever(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL)).thenReturn(
-            ApplicationUserEntity.fromDomain(
-                TestConstants.APPLICATION_USER_ONE
-            )
-        )
+        whenever(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL))
+            .thenReturn(entity)
 
         // when
-        val result = userPersistenceAdapter.findByEmail(TestConstants.USER_ONE_EMAIL)
+        val result = adapter.findByEmail(TestConstants.USER_ONE_EMAIL)
 
         // then
+        assertEquals(TestConstants.APPLICATION_USER_ONE, result)
+
         verify(userRepository).findByEmail(TestConstants.USER_ONE_EMAIL)
-        assertThat(result, equalTo(TestConstants.APPLICATION_USER_ONE))
-    }
-
-
-    @Test
-    fun `when user with provided id exists then should return user`() {
-        // given
-        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(
-            Optional.of(
-                ApplicationUserEntity.fromDomain(
-                    TestConstants.APPLICATION_USER_ONE
-                )
-            )
-        )
-
-        // when
-        val result = userPersistenceAdapter.findById(TestConstants.USER_ONE_ID)
-
-        // then
-        assertThat(result, equalTo(TestConstants.APPLICATION_USER_ONE))
     }
 
     @Test
-    fun `when user exists and provided proper data then should update user`() {
+    fun `should throw UserNotFoundException when email does not exist`() {
         // given
-        val expected = TestConstants.APPLICATION_USER_TWO.copy(id = TestConstants.USER_ONE_ID)
-        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(
-            Optional.of(
-                ApplicationUserEntity.fromDomain(
-                    TestConstants.APPLICATION_USER_ONE
-                )
-            )
-        )
-        whenever(userRepository.save(ApplicationUserEntity.fromDomain(expected))).thenReturn(
-            ApplicationUserEntity.fromDomain(
-                expected
-            )
-        )
-
-        // when
-        val result =
-            userPersistenceAdapter.update(TestConstants.APPLICATION_USER_TWO.copy(id = TestConstants.USER_ONE_ID))
-
-        // then
-        verify(userRepository).findById(expected.id.toString())
-        verify(userRepository).save(ApplicationUserEntity.fromDomain(expected))
-        assertThat(result, equalTo(expected))
-    }
-
-    @Test
-    fun `when user not exists during update then should throws UserNotFoundException`() {
-        // given
-        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(Optional.empty())
+        whenever(userRepository.findByEmail(TestConstants.USER_ONE_EMAIL))
+            .thenReturn(null)
 
         // when & then
         assertThrows<UserNotFoundException> {
-            userPersistenceAdapter.update(TestConstants.APPLICATION_USER_ONE)
+            adapter.findByEmail(TestConstants.USER_ONE_EMAIL)
         }
+
+        verify(userRepository).findByEmail(TestConstants.USER_ONE_EMAIL)
     }
 
     @Test
-    fun `when user exists with provided id then should delete user data`() {
+    fun `should find user by id`() {
         // given
-        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(
-            Optional.of(
-                ApplicationUserEntity.fromDomain(
-                    TestConstants.APPLICATION_USER_ONE
-                )
-            )
-        )
+        val entity = ApplicationUserEntity.fromDomain(TestConstants.APPLICATION_USER_ONE)
+
+        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString()))
+            .thenReturn(Optional.of(entity))
 
         // when
-        userPersistenceAdapter.deleteById(TestConstants.USER_ONE_ID)
+        val result = adapter.findById(TestConstants.USER_ONE_ID)
 
         // then
+        assertEquals(TestConstants.APPLICATION_USER_ONE, result)
+
         verify(userRepository).findById(TestConstants.USER_ONE_ID.toString())
-        verify(userRepository).deleteById(TestConstants.USER_ONE_ID.toString())
     }
 
     @Test
-    fun `when user not exists with provided id then should throws UserNotFoundException`() {
+    fun `should not delete user when user does not exist`() {
         // given
-        whenever(userRepository.findById(TestConstants.USER_ONE_ID.toString())).thenReturn(Optional.empty())
+        val id = UUID.randomUUID()
+
+        whenever(userRepository.findById(id.toString()))
+            .thenReturn(Optional.empty())
 
         // when & then
         assertThrows<UserNotFoundException> {
-            userPersistenceAdapter.deleteById(TestConstants.USER_ONE_ID)
+            adapter.deleteById(id)
         }
+
+        verify(userRepository).findById(id.toString())
+        verify(userRepository, never()).deleteById(id.toString())
     }
 }

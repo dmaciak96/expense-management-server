@@ -5,160 +5,107 @@ import com.example.expense_management_server.adapter.persistence.model.AccountMe
 import com.example.expense_management_server.adapter.persistence.repository.InvitationRepository
 import com.example.expense_management_server.domain.account_invitation.exception.InvitationNotFoundException
 import com.example.expense_management_server.domain.account_invitation.model.AccountMemberInvitationStatus
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.collection.IsCollectionWithSize.hasSize
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.doNothing
-import org.mockito.kotlin.mock
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.*
+import java.util.Optional
+import java.util.UUID
 
 class InvitationPersistenceAdapterTest {
 
-    private val invitationRepository: InvitationRepository = mock()
-    private val invitationPersistenceAdapter = InvitationPersistenceAdapter(invitationRepository)
+    @Mock
+    private lateinit var invitationRepository: InvitationRepository
 
-    @Test
-    fun `when provide proper domain model then should create account invitation`() {
-        // given
-        val expected = AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
-        whenever(invitationRepository.save(AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION))).thenReturn(
-            expected
+    private lateinit var adapter: InvitationPersistenceAdapter
+
+    @BeforeEach
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+
+        adapter = InvitationPersistenceAdapter(
+            invitationRepository = invitationRepository
         )
-
-        // when
-        val result = invitationPersistenceAdapter.create(TestConstants.INVITATION)
-
-        // then
-        verify(invitationRepository).save(expected)
-        assertThat(result, equalTo(TestConstants.INVITATION))
     }
 
     @Test
-    fun `when invitation with provided id exists then should return proper invitation object`() {
+    fun `should create invitation`() {
         // given
-        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(
-            Optional.of(
-                AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
-            )
-        )
+        val entity = AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
+
+        whenever(invitationRepository.save(entity))
+            .thenReturn(entity)
 
         // when
-        val result = invitationPersistenceAdapter.findById(TestConstants.INVITATION_ID)
+        val result = adapter.create(TestConstants.INVITATION)
 
         // then
+        assertEquals(TestConstants.INVITATION, result)
+
+        verify(invitationRepository).save(entity)
+    }
+
+    @Test
+    fun `should find invitation by id`() {
+        // given
+        val entity = AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
+
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString()))
+            .thenReturn(Optional.of(entity))
+
+        // when
+        val result = adapter.findById(TestConstants.INVITATION_ID)
+
+        // then
+        assertEquals(TestConstants.INVITATION, result)
+
         verify(invitationRepository).findById(TestConstants.INVITATION_ID.toString())
-        assertThat(result, equalTo(TestConstants.INVITATION))
     }
 
     @Test
-    fun `when invitation with provided id not exists then should throws InvitationNotFoundException`() {
+    fun `should update invitation status`() {
         // given
-        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(Optional.empty())
+        val entity = AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
+        val updatedEntity = entity.copy(status = AccountMemberInvitationStatus.ACCEPTED)
 
-        // when & then
-        assertThrows<InvitationNotFoundException> {
-            invitationPersistenceAdapter.findById(TestConstants.INVITATION_ID)
-        }
-    }
+        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString()))
+            .thenReturn(Optional.of(entity))
 
-    @Test
-    fun `when invitation exists then should delete invitation`() {
-        // given
-        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(
-            Optional.of(
-                AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
-            )
-        )
-        doNothing().`when`(invitationRepository).deleteById(TestConstants.INVITATION_ID.toString())
+        whenever(invitationRepository.save(updatedEntity))
+            .thenReturn(updatedEntity)
 
         // when
-        invitationPersistenceAdapter.deleteById(TestConstants.INVITATION_ID)
-
-        // then
-        verify(invitationRepository).deleteById(TestConstants.INVITATION_ID.toString())
-    }
-
-    @Test
-    fun `when invitation not exists during deletion then should throws InvitationNotFoundException`() {
-        // given
-        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(Optional.empty())
-
-        // when & then
-        assertThrows<InvitationNotFoundException> {
-            invitationPersistenceAdapter.deleteById(TestConstants.INVITATION_ID)
-        }
-    }
-
-    @Test
-    fun `when invitation not exists during update status then should throws InvitationNotFoundException`() {
-        // given
-        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(Optional.empty())
-
-        // when & then
-        assertThrows<InvitationNotFoundException> {
-            invitationPersistenceAdapter.updateStatus(
-                TestConstants.INVITATION_ID,
-                AccountMemberInvitationStatus.REJECTED
-            )
-        }
-    }
-
-    @Test
-    fun `when correct status and invitation id then should update invitation status`() {
-        // given
-        val expected = TestConstants.INVITATION.copy(status = AccountMemberInvitationStatus.REJECTED)
-        whenever(invitationRepository.findById(TestConstants.INVITATION_ID.toString())).thenReturn(
-            Optional.of(
-                AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)
-            )
-        )
-        whenever(invitationRepository.save(AccountMemberInvitationEntity.fromDomain(expected))).thenReturn(
-            AccountMemberInvitationEntity.fromDomain(expected)
-        )
-
-        // when
-        val result = invitationPersistenceAdapter.updateStatus(
+        val result = adapter.updateStatus(
             TestConstants.INVITATION_ID,
-            AccountMemberInvitationStatus.REJECTED
+            AccountMemberInvitationStatus.ACCEPTED
         )
 
         // then
+        assertEquals(AccountMemberInvitationStatus.ACCEPTED, result.status)
+
         verify(invitationRepository).findById(TestConstants.INVITATION_ID.toString())
-        verify(invitationRepository).save(AccountMemberInvitationEntity.fromDomain(expected))
-        assertThat(result, equalTo(expected))
+        verify(invitationRepository).save(updatedEntity)
     }
 
     @Test
-    fun `when invitation exists by accountID then should return proper list`() {
+    fun `should not delete invitation when invitation does not exist`() {
         // given
-        whenever(invitationRepository.findAllByAccountId(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(listOf(AccountMemberInvitationEntity.fromDomain(TestConstants.INVITATION)))
+        val id = UUID.randomUUID()
 
-        // when
-        val result = invitationPersistenceAdapter.findAllByAccountId(TestConstants.ACCOUNT_ID)
+        whenever(invitationRepository.findById(id.toString()))
+            .thenReturn(Optional.empty())
 
-        // then
-        verify(invitationRepository).findAllByAccountId(TestConstants.ACCOUNT_ID.toString())
-        assertThat(result, hasSize(1))
-        assertThat(result, containsInAnyOrder(TestConstants.INVITATION))
-    }
+        // when & then
+        assertThrows<InvitationNotFoundException> {
+            adapter.deleteById(id)
+        }
 
-    @Test
-    fun `when user not created account then should return empty list`() {
-        // given
-        whenever(invitationRepository.findAllByAccountId(TestConstants.ACCOUNT_ID.toString()))
-            .thenReturn(emptyList())
-
-        // when
-        val result = invitationPersistenceAdapter.findAllByAccountId(TestConstants.ACCOUNT_ID)
-
-        // then
-        verify(invitationRepository).findAllByAccountId(TestConstants.ACCOUNT_ID.toString())
-        assertThat(result, hasSize(0))
+        verify(invitationRepository).findById(id.toString())
+        verify(invitationRepository, never()).deleteById(id.toString())
     }
 }

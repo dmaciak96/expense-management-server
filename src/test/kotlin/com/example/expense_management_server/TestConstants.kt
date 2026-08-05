@@ -19,7 +19,7 @@ object TestConstants {
     val USER_ONE_PASSWORD = "WinterIsC0mming"
     val USER_ONE_PHONE = "123-123-123"
     val USER_ONE_DISPLAY_NAME = "Lord Commander"
-    val USER_ONE_AVATAR_URL = "httpsa://png.com/ghost.png"
+    val USER_ONE_AVATAR_URL = "https://png.com/ghost.png"
     val APPLICATION_USER_ONE = ApplicationUser(
         id = USER_ONE_ID,
         createdAt = Instant.now(),
@@ -41,7 +41,7 @@ object TestConstants {
     val USER_TWO_PASSWORD = "F***Joffrey"
     val USER_TWO_PHONE = "321-123-321"
     val USER_TWO_DISPLAY_NAME = "Queen of The North"
-    val USER_TWO_AVATAR_URL = "httpsa://png.com/lady.png"
+    val USER_TWO_AVATAR_URL = "https://png.com/lady.png"
     val APPLICATION_USER_TWO = ApplicationUser(
         id = USER_TWO_ID,
         createdAt = Instant.now(),

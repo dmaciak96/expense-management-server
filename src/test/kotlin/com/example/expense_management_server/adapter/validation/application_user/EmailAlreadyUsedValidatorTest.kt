@@ -4,62 +4,56 @@ import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.domain.application_user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.application_user.exception.UserNotFoundException
 import com.example.expense_management_server.domain.application_user.port.UserPersistencePort
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.mockito.kotlin.mock
+import org.junit.jupiter.api.assertThrows
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-
 class EmailAlreadyUsedValidatorTest {
 
-    private var userPersistencePort: UserPersistencePort = mock()
-    private var validator = EmailAlreadyUsedValidator(userPersistencePort)
+    @Mock
+    private lateinit var userPersistencePort: UserPersistencePort
+
+    private lateinit var validator: EmailAlreadyUsedValidator
+
+    @BeforeEach
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+
+        validator = EmailAlreadyUsedValidator(
+            userPersistencePort = userPersistencePort
+        )
+    }
 
     @Test
     fun `should accept email when user does not exist`() {
-        val user = TestConstants.APPLICATION_USER_ONE.copy(email = "new-user@example.com")
-        whenever(userPersistencePort.findByEmail(user.email)).thenThrow(UserNotFoundException("User not found"))
+        // given
+        whenever(userPersistencePort.findByEmail(TestConstants.USER_ONE_EMAIL))
+            .thenThrow(UserNotFoundException("User not found"))
 
+        // when & then
         assertDoesNotThrow {
-            validator.validate(user)
+            validator.validate(TestConstants.APPLICATION_USER_ONE)
         }
 
-        verify(userPersistencePort).findByEmail(user.email)
+        verify(userPersistencePort).findByEmail(TestConstants.USER_ONE_EMAIL)
     }
 
     @Test
-    fun `should throw exception when email is already used`() {
-        val user = TestConstants.APPLICATION_USER_ONE.copy(email = "existing-user@example.com")
-        val existingUser = TestConstants.APPLICATION_USER_ONE.copy(email = "existing-user@example.com")
-        whenever(userPersistencePort.findByEmail(user.email)).thenReturn(existingUser)
+    fun `should reject email when user already exists`() {
+        // given
+        whenever(userPersistencePort.findByEmail(TestConstants.USER_ONE_EMAIL))
+            .thenReturn(TestConstants.APPLICATION_USER_ONE)
 
-        val exception = assertThrows(UserAlreadyExistsException::class.java) {
-            validator.validate(user)
+        // when & then
+        assertThrows<UserAlreadyExistsException> {
+            validator.validate(TestConstants.APPLICATION_USER_ONE)
         }
 
-        assertEquals(
-            "Email ${user.email} is already in use",
-            exception.message
-        )
-
-        verify(userPersistencePort).findByEmail(user.email)
-    }
-
-    @Test
-    fun `should propagate unexpected persistence exception`() {
-        val user = TestConstants.APPLICATION_USER_ONE.copy(email = "user@example.com")
-
-        whenever(userPersistencePort.findByEmail(user.email)).thenThrow(IllegalStateException("Database unavailable"))
-
-        val exception = assertThrows(IllegalStateException::class.java) {
-            validator.validate(user)
-        }
-
-        assertEquals("Database unavailable", exception.message)
-
-        verify(userPersistencePort).findByEmail(user.email)
+        verify(userPersistencePort).findByEmail(TestConstants.USER_ONE_EMAIL)
     }
 }

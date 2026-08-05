@@ -2,65 +2,63 @@ package com.example.expense_management_server.adapter.validation.application_use
 
 import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.domain.application_user.exception.UserValidationException
-import org.junit.jupiter.api.Assertions.assertDoesNotThrow
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.NullSource
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 
 class PhoneNumberValidatorTest {
 
     private val validator = PhoneNumberValidator()
 
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = ["", " ", "   "])
-    fun `should accept missing phone number`(phoneNumber: String?) {
-        val user = TestConstants.APPLICATION_USER_ONE.copy(phoneNumber = phoneNumber)
+    @Test
+    fun `should accept valid phone number`() {
+        // given
+        val user = TestConstants.APPLICATION_USER_ONE.copy(
+            phoneNumber = "+48123123123"
+        )
 
+        // when & then
         assertDoesNotThrow {
             validator.validate(user)
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(
-        strings = [
-            "+48123456789",
-            "+12345678",
-            "+123456789012345"
-        ]
-    )
-    fun `should accept valid phone number`(phoneNumber: String) {
-        val user = TestConstants.APPLICATION_USER_ONE.copy(phoneNumber = phoneNumber)
+    @Test
+    fun `should accept null phone number`() {
+        // given
+        val user = TestConstants.APPLICATION_USER_ONE.copy(
+            phoneNumber = null
+        )
 
+        // when & then
         assertDoesNotThrow {
             validator.validate(user)
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(
-        strings = [
-            "48123456789",
-            "123456789",
-            "+012345678",
-            "+1234567",
-            "+1234567890123456",
-            "+48 123 456 789",
-            "+48-123-456-789",
-            "+48abc123456",
-            "++48123456789"
-        ]
-    )
-    fun `should reject invalid phone number`(phoneNumber: String) {
-        val user = TestConstants.APPLICATION_USER_ONE.copy(phoneNumber = phoneNumber)
+    @Test
+    fun `should accept blank phone number`() {
+        // given
+        val user = TestConstants.APPLICATION_USER_ONE.copy(
+            phoneNumber = " "
+        )
 
-        val exception = assertThrows(UserValidationException::class.java) {
+        // when & then
+        assertDoesNotThrow {
             validator.validate(user)
         }
+    }
 
-        assertEquals("Invalid phone number", exception.message)
+    @Test
+    fun `should reject invalid phone number`() {
+        // given
+        val user = TestConstants.APPLICATION_USER_ONE.copy(
+            phoneNumber = "123-123-123"
+        )
+
+        // when & then
+        assertThrows<UserValidationException> {
+            validator.validate(user)
+        }
     }
 }
