@@ -24,9 +24,8 @@ class AddMemberToAccountUseCase(
         LOGGER.info { "Adding new member $applicationUserId to account $accountId" }
         val account = fetchAccountByIdUseCase.execute(accountId)
         val currentUser = fetchCurrentLoginUserUseCase.execute()
-        if (isNotAccountOwner(account, currentUser)) {
-            throw AccountValidationException("Members can be added only by account creator")
-        }
+        // check if current user is invitation recipient
+        // check if invitation is not expired
         if (account.members.any { it.applicationUserId == applicationUserId }) {
             throw AccountValidationException("Member $applicationUserId already exists inside account $accountId")
         }
@@ -42,10 +41,9 @@ class AddMemberToAccountUseCase(
             )
         )
         LOGGER.info { "New member $applicationUserId was added to account $accountId" }
+        // update invitation status
         return updatedAccount
     }
-
-    private fun isNotAccountOwner(account: Account, user: ApplicationUser) = account.createdBy.id != user.id
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
