@@ -1,13 +1,11 @@
 package com.example.expense_management_server.application.account_members
 
 import com.example.expense_management_server.application.account.FetchAccountByIdUseCase
-import com.example.expense_management_server.application.application_user.FetchCurrentLoginUserUseCase
 import com.example.expense_management_server.application.application_user.FetchUserByIdUseCase
 import com.example.expense_management_server.domain.account.exception.AccountValidationException
 import com.example.expense_management_server.domain.account.model.Account
 import com.example.expense_management_server.domain.account.model.AccountMember
 import com.example.expense_management_server.domain.account.port.AccountPersistencePort
-import com.example.expense_management_server.domain.application_user.model.ApplicationUser
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.*
@@ -17,15 +15,11 @@ class AddMemberToAccountUseCase(
     private val fetchAccountByIdUseCase: FetchAccountByIdUseCase,
     private val fetchUserByIdUseCase: FetchUserByIdUseCase,
     private val accountPersistencePort: AccountPersistencePort,
-    private val fetchCurrentLoginUserUseCase: FetchCurrentLoginUserUseCase
 ) {
 
     fun execute(accountId: UUID, applicationUserId: UUID): Account {
         LOGGER.info { "Adding new member $applicationUserId to account $accountId" }
         val account = fetchAccountByIdUseCase.execute(accountId)
-        val currentUser = fetchCurrentLoginUserUseCase.execute()
-        // check if current user is invitation recipient
-        // check if invitation is not expired
         if (account.members.any { it.applicationUserId == applicationUserId }) {
             throw AccountValidationException("Member $applicationUserId already exists inside account $accountId")
         }
@@ -41,7 +35,6 @@ class AddMemberToAccountUseCase(
             )
         )
         LOGGER.info { "New member $applicationUserId was added to account $accountId" }
-        // update invitation status
         return updatedAccount
     }
 

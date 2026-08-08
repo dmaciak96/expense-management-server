@@ -10,7 +10,6 @@ data class AccountMemberInvitation(
     val createdBy: ApplicationUser,
     val accountId: UUID,
     val email: String,
-    val token: String,
     val expiresAt: Instant,
     val acceptedAt: Instant? = null,
     val status: AccountMemberInvitationStatus

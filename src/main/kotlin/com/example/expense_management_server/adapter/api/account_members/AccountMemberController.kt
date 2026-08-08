@@ -19,21 +19,10 @@ import java.util.*
 @RestController
 @RequestMapping("/accounts/{accountId}/members")
 class AccountMemberController(
-    private val addMemberToAccountUseCase: AddMemberToAccountUseCase,
     private val deleteMemberFromAccountUseCase: DeleteMemberFromAccountUseCase,
     private val fetchAllMembersFromAccountUseCase: FetchAllMembersFromAccountUseCase,
     private val fetchMemberByIdAndAccountIdUseCase: FetchMemberByIdAndAccountIdUseCase
 ) {
-
-    @PostMapping("/{applicationUserId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addMemberToAccount(
-        @PathVariable accountId: UUID,
-        @PathVariable applicationUserId: UUID,
-    ): AccountHttpResponse {
-        val account = addMemberToAccountUseCase.execute(accountId, applicationUserId)
-        return AccountHttpResponse.fromDomain(account)
-    }
 
     @DeleteMapping("/{applicationUserId}")
     fun deleteMemberFromAccount(

@@ -2,7 +2,6 @@ package com.example.expense_management_server.application.account_members
 
 import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.application.account.FetchAccountByIdUseCase
-import com.example.expense_management_server.application.application_user.FetchCurrentLoginUserUseCase
 import com.example.expense_management_server.application.application_user.FetchUserByIdUseCase
 import com.example.expense_management_server.domain.account.exception.AccountValidationException
 import com.example.expense_management_server.domain.account.port.AccountPersistencePort
@@ -27,9 +26,6 @@ class AddMemberToAccountUseCaseTest {
     @Mock
     private lateinit var accountPersistencePort: AccountPersistencePort
 
-    @Mock
-    private lateinit var fetchCurrentLoginUserUseCase: FetchCurrentLoginUserUseCase
-
     private lateinit var useCase: AddMemberToAccountUseCase
 
     @BeforeEach
@@ -40,7 +36,6 @@ class AddMemberToAccountUseCaseTest {
             fetchAccountByIdUseCase = fetchAccountByIdUseCase,
             fetchUserByIdUseCase = fetchUserByIdUseCase,
             accountPersistencePort = accountPersistencePort,
-            fetchCurrentLoginUserUseCase = fetchCurrentLoginUserUseCase
         )
     }
 
@@ -57,9 +52,6 @@ class AddMemberToAccountUseCaseTest {
 
         whenever(fetchAccountByIdUseCase.execute(TestConstants.ACCOUNT_ID))
             .thenReturn(account)
-
-        whenever(fetchCurrentLoginUserUseCase.execute())
-            .thenReturn(TestConstants.APPLICATION_USER_ONE)
 
         whenever(fetchUserByIdUseCase.execute(TestConstants.USER_TWO_ID))
             .thenReturn(TestConstants.APPLICATION_USER_TWO)
@@ -81,7 +73,6 @@ class AddMemberToAccountUseCaseTest {
         assertSame(updatedAccount, result)
 
         verify(fetchAccountByIdUseCase).execute(TestConstants.ACCOUNT_ID)
-        verify(fetchCurrentLoginUserUseCase).execute()
         verify(fetchUserByIdUseCase).execute(TestConstants.USER_TWO_ID)
         verify(accountPersistencePort).addAccountMember(TestConstants.ACCOUNT_ID, member)
     }
@@ -91,9 +82,6 @@ class AddMemberToAccountUseCaseTest {
         // given
         whenever(fetchAccountByIdUseCase.execute(TestConstants.ACCOUNT_ID))
             .thenReturn(TestConstants.ACCOUNT)
-
-        whenever(fetchCurrentLoginUserUseCase.execute())
-            .thenReturn(TestConstants.APPLICATION_USER_TWO)
 
         // when
         assertThrows<AccountValidationException> {
@@ -105,7 +93,6 @@ class AddMemberToAccountUseCaseTest {
 
         // then
         verify(fetchAccountByIdUseCase).execute(TestConstants.ACCOUNT_ID)
-        verify(fetchCurrentLoginUserUseCase).execute()
         verify(fetchUserByIdUseCase, never()).execute(org.mockito.kotlin.any())
         verify(accountPersistencePort, never())
             .addAccountMember(org.mockito.kotlin.any(), org.mockito.kotlin.any())
@@ -117,9 +104,6 @@ class AddMemberToAccountUseCaseTest {
         whenever(fetchAccountByIdUseCase.execute(TestConstants.ACCOUNT_ID))
             .thenReturn(TestConstants.ACCOUNT)
 
-        whenever(fetchCurrentLoginUserUseCase.execute())
-            .thenReturn(TestConstants.APPLICATION_USER_ONE)
-
         // when
         assertThrows<AccountValidationException> {
             useCase.execute(
@@ -130,7 +114,6 @@ class AddMemberToAccountUseCaseTest {
 
         // then
         verify(fetchAccountByIdUseCase).execute(TestConstants.ACCOUNT_ID)
-        verify(fetchCurrentLoginUserUseCase).execute()
         verify(fetchUserByIdUseCase, never()).execute(org.mockito.kotlin.any())
         verify(accountPersistencePort, never())
             .addAccountMember(org.mockito.kotlin.any(), org.mockito.kotlin.any())

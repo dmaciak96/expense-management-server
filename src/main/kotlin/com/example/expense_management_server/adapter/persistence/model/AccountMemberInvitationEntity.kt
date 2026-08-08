@@ -16,7 +16,6 @@ data class AccountMemberInvitationEntity(
     @CreatedBy val createdBy: ApplicationUserEntity,
     val accountId: String,
     val email: String,
-    val token: String,
     val expiresAt: Instant,
     val acceptedAt: Instant?,
     val status: AccountMemberInvitationStatus
@@ -27,7 +26,6 @@ data class AccountMemberInvitationEntity(
         createdBy = this.createdBy.toDomain(),
         accountId = UUID.fromString(this.accountId),
         email = this.email,
-        token = this.token,
         expiresAt = this.expiresAt,
         acceptedAt = this.acceptedAt,
         status = this.status
@@ -40,7 +38,6 @@ data class AccountMemberInvitationEntity(
             createdBy = ApplicationUserEntity.fromDomain(domain.createdBy),
             accountId = domain.accountId.toString(),
             email = domain.email,
-            token = domain.token,
             expiresAt = domain.expiresAt,
             acceptedAt = domain.acceptedAt,
             status = domain.status
