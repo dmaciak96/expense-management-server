@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
-import java.time.temporal.ChronoUnit
+import java.time.OffsetDateTime
 import java.util.*
 
 @RestController
@@ -38,7 +38,9 @@ class AccountInvitationController(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
             createdBy = fetchCurrentLoginUserUseCase.execute(),
-            expiresAt = Instant.now().plus(1, ChronoUnit.MONTHS),
+            expiresAt = OffsetDateTime.now()
+                .plusMonths(1)
+                .toInstant()
         )
 
         val createdInvitation = createAccountInvitationUseCase.execute(invitation)
