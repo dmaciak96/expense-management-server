@@ -3,7 +3,6 @@ package com.example.expense_management_server.adapter.api
 import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.adapter.api.account_members.AccountMemberController
 import com.example.expense_management_server.adapter.api.account_members.AccountMemberControllerAdvice
-import com.example.expense_management_server.application.account_members.AddMemberToAccountUseCase
 import com.example.expense_management_server.application.account_members.DeleteMemberFromAccountUseCase
 import com.example.expense_management_server.application.account_members.FetchAllMembersFromAccountUseCase
 import com.example.expense_management_server.application.account_members.FetchMemberByIdAndAccountIdUseCase
@@ -17,13 +16,9 @@ import org.mockito.kotlin.whenever
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 class AccountMemberControllerTest {
-
-    @Mock
-    private lateinit var addMemberToAccountUseCase: AddMemberToAccountUseCase
 
     @Mock
     private lateinit var deleteMemberFromAccountUseCase: DeleteMemberFromAccountUseCase
@@ -41,7 +36,6 @@ class AccountMemberControllerTest {
         MockitoAnnotations.openMocks(this)
 
         val controller = AccountMemberController(
-            addMemberToAccountUseCase,
             deleteMemberFromAccountUseCase,
             fetchAllMembersFromAccountUseCase,
             fetchMemberByIdAndAccountIdUseCase
@@ -51,28 +45,6 @@ class AccountMemberControllerTest {
             .standaloneSetup(controller)
             .setControllerAdvice(AccountMemberControllerAdvice())
             .build()
-    }
-
-    @Test
-    fun `should add member to account`() {
-        // given
-        whenever(
-            addMemberToAccountUseCase.execute(
-                TestConstants.ACCOUNT_ID,
-                TestConstants.USER_TWO_ID
-            )
-        ).thenReturn(TestConstants.ACCOUNT)
-
-        // when & then
-        mockMvc.post(
-            "/accounts/${TestConstants.ACCOUNT_ID}/members/${TestConstants.USER_TWO_ID}"
-        ).andExpect {
-            status { isCreated() }
-            jsonPath("$.id") { value(TestConstants.ACCOUNT_ID.toString()) }
-        }
-
-        verify(addMemberToAccountUseCase)
-            .execute(TestConstants.ACCOUNT_ID, TestConstants.USER_TWO_ID)
     }
 
     @Test

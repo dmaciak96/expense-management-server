@@ -85,7 +85,6 @@ object TestConstants {
     )
 
     val INVITATION_ID = UUID.fromString("1783c509-022e-4abf-83d1-76fb4e64c8f5")
-    val INVITATION_TOKEN = "test-invitation-token"
     val INVITATION_EXPIRES_AT = Instant.now()
     val INVITATION_ACCEPTED_AT = null
     val INVITATION_STATUS = AccountMemberInvitationStatus.PENDING
@@ -95,7 +94,6 @@ object TestConstants {
         createdBy = APPLICATION_USER_ONE,
         accountId = ACCOUNT.id,
         email = APPLICATION_USER_TWO.email,
-        token = INVITATION_TOKEN,
         expiresAt = INVITATION_EXPIRES_AT,
         acceptedAt = INVITATION_ACCEPTED_AT,
         status = INVITATION_STATUS
