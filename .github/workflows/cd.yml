@@ -29,7 +29,7 @@ jobs:
         run: ./gradlew bootJar -x test
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: expense-management-server
           path: build/libs/*.jar
