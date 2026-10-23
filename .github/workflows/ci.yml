@@ -1,14 +1,24 @@
 name: ci
 
-# The workflow runs when a pull request targets the master branch
 on:
   pull_request:
-    branches:
-      - master
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   ci:
+    name: Build and test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -25,13 +35,16 @@ jobs:
       - name: Make Gradle Wrapper executable
         run: chmod +x gradlew
 
-      - name: Compile and run tests
-        run: ./gradlew clean test
+      - name: Run verification
+        run: ./gradlew clean check --no-daemon
 
-      - name: Upload test report
+      - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: test-report
-          path: build/reports/tests/test
-          retention-days: 1
+          name: test-reports
+          path: |
+            build/reports/
+            build/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
