@@ -28,7 +28,7 @@ class SecurityConfiguration {
         http
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers(HttpMethod.POST, "/users", "/login")
+                    .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login")
                     .permitAll()
                     .requestMatchers(
                         "/v3/api-docs/**",

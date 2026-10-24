@@ -119,6 +119,8 @@ Without the `local` profile, the application expects the following environment v
 DB_URI
 JWT_SECRET
 JWT_TOKEN_EXPIRATION_IN_SECONDS
+SMTP_USERNAME
+SMTP_PASSWORD
 ```
 
 Example:
@@ -127,6 +129,7 @@ Example:
 export DB_URI="mongodb://username:password@localhost:27017/expense-management?authSource=admin"
 export JWT_SECRET="your-base64-encoded-secret"
 export JWT_TOKEN_EXPIRATION_IN_SECONDS="3600"
+...
 
 java -jar build/libs/expense-management-server-1.0.0.jar
 ```
