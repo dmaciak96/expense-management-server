@@ -7,8 +7,6 @@ import com.example.expense_management_server.application.application_user.FetchC
 import com.example.expense_management_server.application.application_user.FetchUserByEmailUseCase
 import com.example.expense_management_server.application.application_user.RemoveCurrentLoginUserUseCase
 import com.example.expense_management_server.application.application_user.UpdateUserDataUseCase
-import com.example.expense_management_server.application.application_user.UserRegistrationUseCase
-import com.example.expense_management_server.domain.application_user.exception.UserAlreadyExistsException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
@@ -20,7 +18,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
@@ -31,9 +28,6 @@ class ApplicationUserControllerTest {
 
     @Mock
     private lateinit var fetchUserByEmailUseCase: FetchUserByEmailUseCase
-
-    @Mock
-    private lateinit var userRegistrationUseCase: UserRegistrationUseCase
 
     @Mock
     private lateinit var removeCurrentLoginUserUseCase: RemoveCurrentLoginUserUseCase
@@ -50,7 +44,6 @@ class ApplicationUserControllerTest {
         val controller = ApplicationUserController(
             fetchCurrentLoginUserUseCase,
             fetchUserByEmailUseCase,
-            userRegistrationUseCase,
             removeCurrentLoginUserUseCase,
             updateUserDataUseCase
         )
@@ -59,61 +52,6 @@ class ApplicationUserControllerTest {
             .standaloneSetup(controller)
             .setControllerAdvice(ApplicationUserControllerAdvice())
             .build()
-    }
-
-    @Test
-    fun `should register user`() {
-        // given
-        whenever(userRegistrationUseCase.execute(any()))
-            .thenReturn(TestConstants.APPLICATION_USER_ONE)
-
-        val body = """
-            {
-              "firstName": "${TestConstants.APPLICATION_USER_ONE.firstName}",
-              "lastName": "${TestConstants.APPLICATION_USER_ONE.lastName}",
-              "email": "${TestConstants.USER_ONE_EMAIL}",
-              "password": "Password1!",
-              "phoneNumber": null,
-              "displayName": null,
-              "avatarUrl": null
-            }
-        """.trimIndent()
-
-        // when & then
-        mockMvc.post("/users") {
-            contentType = MediaType.APPLICATION_JSON
-            content = body
-        }.andExpect {
-            status { isCreated() }
-            jsonPath("$.id") { value(TestConstants.USER_ONE_ID.toString()) }
-            jsonPath("$.email") { value(TestConstants.USER_ONE_EMAIL) }
-        }
-
-        verify(userRegistrationUseCase).execute(any())
-    }
-
-    @Test
-    fun `should return bad request when registration email is invalid`() {
-        // given
-        val body = """
-            {
-              "firstName": "Jon",
-              "lastName": "Snow",
-              "email": "invalid-email",
-              "password": "Password1!",
-              "phoneNumber": null,
-              "displayName": null,
-              "avatarUrl": null
-            }
-        """.trimIndent()
-
-        // when & then
-        mockMvc.post("/users") {
-            contentType = MediaType.APPLICATION_JSON
-            content = body
-        }.andExpect {
-            status { isBadRequest() }
-        }
     }
 
     @Test
@@ -186,34 +124,5 @@ class ApplicationUserControllerTest {
             }
 
         verify(removeCurrentLoginUserUseCase).execute()
-    }
-
-    @Test
-    fun `should return conflict error response when user already exists`() {
-        // given
-        whenever(userRegistrationUseCase.execute(any()))
-            .thenThrow(UserAlreadyExistsException("User already exists"))
-
-        val body = """
-            {
-              "firstName": "Jon",
-              "lastName": "Snow",
-              "email": "jon.snow@example.com",
-              "password": "Password1!",
-              "phoneNumber": null,
-              "displayName": null,
-              "avatarUrl": null
-            }
-        """.trimIndent()
-
-        // when & then
-        mockMvc.post("/users") {
-            contentType = MediaType.APPLICATION_JSON
-            content = body
-        }.andExpect {
-            status { isConflict() }
-            jsonPath("$.message") { value("User already exists") }
-            jsonPath("$.status") { value(409) }
-        }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.expense_management_server.adapter.api.login.model
+package com.example.expense_management_server.adapter.api.auth.model
 
 data class LoginHttpResponse(
     val accessToken: String,

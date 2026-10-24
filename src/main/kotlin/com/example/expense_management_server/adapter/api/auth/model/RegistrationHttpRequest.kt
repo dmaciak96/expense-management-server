@@ -1,4 +1,4 @@
-package com.example.expense_management_server.adapter.api.application_user.model
+package com.example.expense_management_server.adapter.api.auth.model
 
 import com.example.expense_management_server.domain.application_user.model.ApplicationUser
 import com.example.expense_management_server.domain.application_user.model.ApplicationUserStatus
@@ -8,8 +8,7 @@ import jakarta.validation.constraints.Size
 import java.time.Instant
 import java.util.*
 
-data class ApplicationUserRegistrationHttpRequest(
-
+data class RegistrationHttpRequest(
     @NotBlank
     @Size(min = 2)
     val firstName: String,
