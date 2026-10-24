@@ -31,10 +31,65 @@ class AuthenticationController(
         return LoginHttpResponse(accessToken = tokenValue.token, expiresIn = jwtProperties.expiration)
     }
 
+    @PostMapping("/logout")
+    fun logout() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/token/refresh")
+    fun refreshAccessToken() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/token/revoke")
+    fun revokeAccessToken() {
+        throw NotImplementedError()
+    }
+
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
     fun registerNewUser(@Valid @RequestBody registrationRequest: RegistrationHttpRequest): RegistrationHttpResponse {
         val registeredUser = userRegistrationUseCase.execute(registrationRequest.toDomain())
         return RegistrationHttpResponse.fromDomain(registeredUser)
+    }
+
+    @PostMapping("/email/verify")
+    fun verifyEmail() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("email/verification")
+    fun sendEmailVerificationMessage() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/password/forgot")
+    fun sendPasswordResetMessage() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/password/reset")
+    fun resetPassword() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/mfa/enroll")
+    fun enrollMfa() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/mfa/replace")
+    fun replaceMfa() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/mfa/confirm")
+    fun confirmMfa() {
+        throw NotImplementedError()
+    }
+
+    @PostMapping("/mfa/verify")
+    fun verifyMfa() {
+        throw NotImplementedError()
     }
 }
