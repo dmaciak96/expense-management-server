@@ -34,6 +34,30 @@ class JwtAuthenticationAdapter(
         return AuthenticationToken(token)
     }
 
+    private fun generateJwtToken(authentication: Authentication): String {
+        val now = Instant.now()
+
+        val roles = authentication.authorities
+            .map { it.authority }
+
+        val claims = JwtClaimsSet.builder()
+            .issuer(ISSUER)
+            .issuedAt(now)
+            .expiresAt(now.plusSeconds(jwtProperties.expiration))
+            .subject(authentication.name)
+            .claim(ROLES_CLAIM_KEY, roles)
+            .build()
+
+        val header = JwsHeader
+            .with(MacAlgorithm.HS256)
+            .type(TOKEN_HEADER_TYPE)
+            .build()
+
+        return jwtEncoder.encode(
+            JwtEncoderParameters.from(header, claims)
+        ).tokenValue
+    }
+
     override fun generateAccountVerificationToken(applicationUser: ApplicationUser): String {
         val now = Instant.now()
         val claims = JwtClaimsSet.builder()
@@ -70,30 +94,6 @@ class JwtAuthenticationAdapter(
         } catch (e: JwtException) {
             throw VerificationTokenException(cause = e)
         }
-    }
-
-    private fun generateJwtToken(authentication: Authentication): String {
-        val now = Instant.now()
-
-        val roles = authentication.authorities
-            .map { it.authority }
-
-        val claims = JwtClaimsSet.builder()
-            .issuer(ISSUER)
-            .issuedAt(now)
-            .expiresAt(now.plusSeconds(jwtProperties.expiration))
-            .subject(authentication.name)
-            .claim(ROLES_CLAIM_KEY, roles)
-            .build()
-
-        val header = JwsHeader
-            .with(MacAlgorithm.HS256)
-            .type(TOKEN_HEADER_TYPE)
-            .build()
-
-        return jwtEncoder.encode(
-            JwtEncoderParameters.from(header, claims)
-        ).tokenValue
     }
 
     companion object {
