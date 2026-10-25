@@ -5,6 +5,7 @@ import com.example.expense_management_server.adapter.api.auth.model.LoginHttpRes
 import com.example.expense_management_server.adapter.api.auth.model.RegistrationHttpRequest
 import com.example.expense_management_server.adapter.api.auth.model.RegistrationHttpResponse
 import com.example.expense_management_server.adapter.security.config.JwtProperties
+import com.example.expense_management_server.application.application_user.UserAccountVerificationUseCase
 import com.example.expense_management_server.application.application_user.UserLoginUseCase
 import com.example.expense_management_server.application.application_user.UserRegistrationUseCase
 import com.example.expense_management_server.domain.authentication.model.UserAuthentication
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*
 class AuthenticationController(
     private val userLoginUseCase: UserLoginUseCase,
     private val userRegistrationUseCase: UserRegistrationUseCase,
+    private val userAccountVerificationUseCase: UserAccountVerificationUseCase,
     private val jwtProperties: JwtProperties
 ) {
 
@@ -53,14 +55,9 @@ class AuthenticationController(
         return RegistrationHttpResponse.fromDomain(registeredUser)
     }
 
-    @PostMapping("/email/verify")
-    fun verifyEmail() {
-        throw NotImplementedError()
-    }
-
-    @PostMapping("email/verification")
-    fun sendEmailVerificationMessage() {
-        throw NotImplementedError()
+    @GetMapping("/email/verify")
+    fun verifyEmail(@RequestParam token: String) {
+        userAccountVerificationUseCase.execute(token)
     }
 
     @PostMapping("/password/forgot")

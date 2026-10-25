@@ -30,6 +30,8 @@ class SecurityConfiguration {
                 auth
                     .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login")
                     .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/auth/email/verify*")
+                    .permitAll()
                     .requestMatchers(
                         "/v3/api-docs/**",
                         "/v3/api-docs.yaml",

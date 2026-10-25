@@ -1,9 +1,10 @@
 package com.example.expense_management_server.application.application_user
 
+import com.example.expense_management_server.domain.account_invitation.port.NotificationSenderPort
 import com.example.expense_management_server.domain.application_user.model.ApplicationUser
-import com.example.expense_management_server.domain.authentication.port.PasswordEncoderPort
 import com.example.expense_management_server.domain.application_user.port.UserPersistencePort
 import com.example.expense_management_server.domain.application_user.port.UserValidationPort
+import com.example.expense_management_server.domain.authentication.port.PasswordEncoderPort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Component
 class UserRegistrationUseCase(
     private val userDataValidators: List<UserValidationPort>,
     private val userPersistencePort: UserPersistencePort,
-    private val passwordEncoderPort: PasswordEncoderPort
+    private val passwordEncoderPort: PasswordEncoderPort,
+    private val notificationSenderPort: NotificationSenderPort
 ) {
 
     fun execute(applicationUser: ApplicationUser): ApplicationUser {
@@ -25,6 +27,7 @@ class UserRegistrationUseCase(
         LOGGER.debug { "Password encoded successfully" }
         val user = userPersistencePort.create(applicationUser.copy(password = encodedPassword))
         LOGGER.info { "User ${user.email} registered successfully" }
+        notificationSenderPort.sendUserVerificationMessage(user)
         return user
     }
 

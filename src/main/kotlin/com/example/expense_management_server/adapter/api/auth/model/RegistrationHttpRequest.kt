@@ -40,6 +40,6 @@ data class RegistrationHttpRequest(
         password = password.trim(),
         displayName = displayName?.trim(),
         avatarUrl = avatarUrl?.trim(),
-        status = ApplicationUserStatus.ACTIVE
+        status = ApplicationUserStatus.INACTIVE
     )
 }

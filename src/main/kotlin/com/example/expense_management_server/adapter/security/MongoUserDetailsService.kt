@@ -1,5 +1,6 @@
 package com.example.expense_management_server.adapter.security
 
+import com.example.expense_management_server.domain.application_user.model.ApplicationUserStatus
 import com.example.expense_management_server.domain.application_user.port.UserPersistencePort
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
@@ -18,6 +19,7 @@ class MongoUserDetailsService(
             .username(user.email)
             .password(user.password)
             .authorities(listOf(SimpleGrantedAuthority("ROLE_USER")))
+            .disabled(user.status == ApplicationUserStatus.INACTIVE)
             .build()
     }
 }
