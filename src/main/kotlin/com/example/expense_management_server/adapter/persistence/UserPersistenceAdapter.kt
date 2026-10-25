@@ -14,10 +14,10 @@ class UserPersistenceAdapter(
     private val userRepository: UserRepository
 ) : UserPersistencePort {
     override fun create(user: ApplicationUser): ApplicationUser {
-        LOGGER.debug { "Saving new user in DB $user" }
+        LOGGER.debug { "Saving new user in DB ${user.email}" }
         val savedEntity = userRepository.save(ApplicationUserEntity.fromDomain(user))
         val savedDomain = savedEntity.toDomain()
-        LOGGER.debug { "Saved new user in DB $savedDomain" }
+        LOGGER.debug { "Saved new user in DB ${savedDomain.email}" }
         return savedDomain
     }
 
@@ -26,7 +26,7 @@ class UserPersistenceAdapter(
         val userEntity =
             userRepository.findByEmail(email) ?: throw UserNotFoundException("User with email $email not found")
         val domain = userEntity.toDomain()
-        LOGGER.debug { "User founded by it's email: $domain" }
+        LOGGER.debug { "User founded by it's email: ${domain.email}" }
         return domain
     }
 
@@ -34,7 +34,7 @@ class UserPersistenceAdapter(
         return userRepository.findById(id.toString())
             .map {
                 val domain = it.toDomain()
-                LOGGER.debug { "User founded by it's ID: $domain" }
+                LOGGER.debug { "User founded by it's ID: ${domain.email}" }
                 return@map domain
             }
             .orElseThrow { UserNotFoundException("User not found with specified ID: $id") }
@@ -43,10 +43,10 @@ class UserPersistenceAdapter(
     override fun update(user: ApplicationUser): ApplicationUser {
         userRepository.findById(user.id.toString())
             .orElseThrow { UserNotFoundException("User not found with specified ID: ${user.id}") }
-        LOGGER.debug { "Updating user in DB with new data: $user" }
+        LOGGER.debug { "Updating user in DB with new data: ${user.email}" }
         val updatedEntity = userRepository.save(ApplicationUserEntity.fromDomain(user))
         val domain = updatedEntity.toDomain()
-        LOGGER.debug { "User updated successfully $domain" }
+        LOGGER.debug { "User updated successfully ${domain.email}" }
         return domain
     }
 

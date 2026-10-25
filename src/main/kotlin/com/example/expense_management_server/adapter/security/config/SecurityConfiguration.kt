@@ -28,7 +28,7 @@ class SecurityConfiguration {
         http
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login")
+                    .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login", "/auth/token/refresh")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/auth/email/verify*")
                     .permitAll()

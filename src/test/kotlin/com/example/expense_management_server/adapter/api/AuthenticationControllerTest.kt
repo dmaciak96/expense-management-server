@@ -3,12 +3,14 @@ package com.example.expense_management_server.adapter.api
 import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.adapter.api.auth.AuthenticationController
 import com.example.expense_management_server.adapter.api.auth.AuthenticationControllerAdvice
-import com.example.expense_management_server.adapter.security.config.JwtProperties
 import com.example.expense_management_server.application.application_user.UserAccountVerificationUseCase
-import com.example.expense_management_server.application.application_user.UserLoginUseCase
 import com.example.expense_management_server.application.application_user.UserRegistrationUseCase
+import com.example.expense_management_server.application.authentication.GenerateRefreshTokenUseCase
+import com.example.expense_management_server.application.authentication.RefreshAccessTokenUseCase
+import com.example.expense_management_server.application.authentication.UserLoginUseCase
 import com.example.expense_management_server.domain.application_user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.authentication.model.AuthenticationToken
+import com.example.expense_management_server.domain.authentication.model.RefreshToken
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
@@ -21,6 +23,8 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import java.time.Instant
+import java.util.*
 
 class AuthenticationControllerTest {
 
@@ -33,6 +37,12 @@ class AuthenticationControllerTest {
     @Mock
     private lateinit var userAccountVerificationUseCase: UserAccountVerificationUseCase
 
+    @Mock
+    private lateinit var generateRefreshTokenUseCase: GenerateRefreshTokenUseCase
+
+    @Mock
+    private lateinit var refreshAccessTokenUseCase: RefreshAccessTokenUseCase
+
     private lateinit var mockMvc: MockMvc
 
     @BeforeEach
@@ -42,11 +52,9 @@ class AuthenticationControllerTest {
         val controller = AuthenticationController(
             userLoginUseCase = userLoginUseCase,
             userRegistrationUseCase = userRegistrationUseCase,
-            jwtProperties = JwtProperties(
-                secret = "test-secret",
-                expirationInSeconds = 3600
-            ),
-            userAccountVerificationUseCase = userAccountVerificationUseCase
+            userAccountVerificationUseCase = userAccountVerificationUseCase,
+            generateRefreshTokenUseCase = generateRefreshTokenUseCase,
+            refreshAccessTokenUseCase = refreshAccessTokenUseCase,
         )
 
         mockMvc = MockMvcBuilders
@@ -142,8 +150,20 @@ class AuthenticationControllerTest {
     @Test
     fun `should login user`() {
         // given
+        val refreshToken = UUID.randomUUID()
         whenever(userLoginUseCase.execute(any()))
-            .thenReturn(AuthenticationToken("jwt-token"))
+            .thenReturn(AuthenticationToken("jwt-token", "dummy-email@test.com"))
+
+        whenever(generateRefreshTokenUseCase.execute(any<String>()))
+            .thenReturn(
+                RefreshToken(
+                    id = UUID.randomUUID(),
+                    createdAt = Instant.now(),
+                    expireAt = Instant.now(),
+                    applicationUserId = UUID.randomUUID(),
+                    token = refreshToken
+                )
+            )
 
         val body = """
             {
@@ -159,8 +179,7 @@ class AuthenticationControllerTest {
         }.andExpect {
             status { isOk() }
             jsonPath("$.accessToken") { value("jwt-token") }
-            jsonPath("$.tokenType") { value("Bearer") }
-            jsonPath("$.expiresIn") { value(3600) }
+            jsonPath("$.refreshToken") { value(refreshToken.toString()) }
         }
 
         verify(userLoginUseCase).execute(any())

@@ -1,4 +1,4 @@
-package com.example.expense_management_server.application.application_user
+package com.example.expense_management_server.application.authentication
 
 import com.example.expense_management_server.domain.authentication.model.AuthenticationToken
 import com.example.expense_management_server.domain.authentication.model.UserAuthentication

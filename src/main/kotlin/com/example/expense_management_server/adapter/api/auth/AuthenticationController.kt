@@ -4,10 +4,11 @@ import com.example.expense_management_server.adapter.api.auth.model.LoginHttpReq
 import com.example.expense_management_server.adapter.api.auth.model.LoginHttpResponse
 import com.example.expense_management_server.adapter.api.auth.model.RegistrationHttpRequest
 import com.example.expense_management_server.adapter.api.auth.model.RegistrationHttpResponse
-import com.example.expense_management_server.adapter.security.config.JwtProperties
 import com.example.expense_management_server.application.application_user.UserAccountVerificationUseCase
-import com.example.expense_management_server.application.application_user.UserLoginUseCase
 import com.example.expense_management_server.application.application_user.UserRegistrationUseCase
+import com.example.expense_management_server.application.authentication.GenerateRefreshTokenUseCase
+import com.example.expense_management_server.application.authentication.RefreshAccessTokenUseCase
+import com.example.expense_management_server.application.authentication.UserLoginUseCase
 import com.example.expense_management_server.domain.authentication.model.UserAuthentication
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -19,7 +20,8 @@ class AuthenticationController(
     private val userLoginUseCase: UserLoginUseCase,
     private val userRegistrationUseCase: UserRegistrationUseCase,
     private val userAccountVerificationUseCase: UserAccountVerificationUseCase,
-    private val jwtProperties: JwtProperties
+    private val generateRefreshTokenUseCase: GenerateRefreshTokenUseCase,
+    private val refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
 ) {
 
     @PostMapping("login")
@@ -30,7 +32,8 @@ class AuthenticationController(
                 password = loginHttpRequest.password
             )
         )
-        return LoginHttpResponse(accessToken = tokenValue.token, expiresIn = jwtProperties.expirationInSeconds)
+        val refreshToken = generateRefreshTokenUseCase.execute(loginHttpRequest.email)
+        return LoginHttpResponse(accessToken = tokenValue.token, refreshToken = refreshToken.token.toString())
     }
 
     @PostMapping("/logout")
@@ -39,8 +42,10 @@ class AuthenticationController(
     }
 
     @PostMapping("/token/refresh")
-    fun refreshAccessToken() {
-        throw NotImplementedError()
+    fun refreshAccessToken(@RequestParam refreshToken: String): LoginHttpResponse {
+        val accessToken = refreshAccessTokenUseCase.execute(refreshToken)
+        val refreshToken = generateRefreshTokenUseCase.execute(accessToken.email)
+        return LoginHttpResponse(accessToken = accessToken.token, refreshToken = refreshToken.token.toString())
     }
 
     @PostMapping("register")

@@ -3,6 +3,7 @@ package com.example.expense_management_server.adapter.api.auth
 import com.example.expense_management_server.adapter.api.ErrorResponse
 import com.example.expense_management_server.domain.application_user.exception.UserAlreadyExistsException
 import com.example.expense_management_server.domain.application_user.exception.UserValidationException
+import com.example.expense_management_server.domain.authentication.exception.RefreshTokenNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.AuthenticationException
@@ -22,6 +23,13 @@ class AuthenticationControllerAdvice {
         exception: UserAlreadyExistsException
     ): ResponseEntity<ErrorResponse> {
         return buildErrorResponse(exception, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(RefreshTokenNotFoundException::class)
+    fun handleRefreshTokenNotFoundException(
+        exception: RefreshTokenNotFoundException
+    ): ResponseEntity<ErrorResponse> {
+        return buildErrorResponse(exception, HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(UserValidationException::class)

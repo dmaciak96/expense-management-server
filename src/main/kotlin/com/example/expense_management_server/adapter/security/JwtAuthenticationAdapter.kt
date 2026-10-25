@@ -1,14 +1,17 @@
 package com.example.expense_management_server.adapter.security
 
 import com.example.expense_management_server.adapter.security.config.JwtProperties
+import com.example.expense_management_server.application.application_user.FetchUserByIdUseCase
 import com.example.expense_management_server.domain.application_user.exception.VerificationTokenException
 import com.example.expense_management_server.domain.application_user.model.ApplicationUser
 import com.example.expense_management_server.domain.authentication.model.AuthenticationToken
+import com.example.expense_management_server.domain.authentication.model.RefreshToken
 import com.example.expense_management_server.domain.authentication.model.UserAuthentication
 import com.example.expense_management_server.domain.authentication.port.AuthenticationPort
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Component
@@ -21,6 +24,8 @@ class JwtAuthenticationAdapter(
     private val jwtProperties: JwtProperties,
     private val jwtEncoder: JwtEncoder,
     private val jwtDecoder: JwtDecoder,
+    private val userDetailsService: UserDetailsService,
+    private val fetchUserByIdUseCase: FetchUserByIdUseCase,
 ) : AuthenticationPort {
 
     override fun generateAuthenticationToken(userAuthentication: UserAuthentication): AuthenticationToken {
@@ -31,7 +36,19 @@ class JwtAuthenticationAdapter(
             )
         )
         val token = generateJwtToken(authentication)
-        return AuthenticationToken(token)
+        return AuthenticationToken(token, userAuthentication.email)
+    }
+
+    override fun generateAuthenticationToken(refreshToken: RefreshToken): AuthenticationToken {
+        val user = fetchUserByIdUseCase.execute(refreshToken.applicationUserId)
+        val userDetails = userDetailsService.loadUserByUsername(user.email)
+        val authentication = UsernamePasswordAuthenticationToken.authenticated(
+            userDetails,
+            null,
+            userDetails.authorities
+        )
+        val token = generateJwtToken(authentication)
+        return AuthenticationToken(token, user.email)
     }
 
     private fun generateJwtToken(authentication: Authentication): String {
