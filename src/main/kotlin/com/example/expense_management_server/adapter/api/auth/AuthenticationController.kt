@@ -30,7 +30,7 @@ class AuthenticationController(
                 password = loginHttpRequest.password
             )
         )
-        return LoginHttpResponse(accessToken = tokenValue.token, expiresIn = jwtProperties.expiration)
+        return LoginHttpResponse(accessToken = tokenValue.token, expiresIn = jwtProperties.expirationInSeconds)
     }
 
     @PostMapping("/logout")
@@ -40,11 +40,6 @@ class AuthenticationController(
 
     @PostMapping("/token/refresh")
     fun refreshAccessToken() {
-        throw NotImplementedError()
-    }
-
-    @PostMapping("/token/revoke")
-    fun revokeAccessToken() {
         throw NotImplementedError()
     }
 

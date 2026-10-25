@@ -17,4 +17,4 @@ spring:
 security:
   jwt:
     secret: ${JWT_SECRET}
-    expiration: ${JWT_TOKEN_EXPIRATION_IN_SECONDS}
+    expirationInSeconds: ${JWT_TOKEN_EXPIRATION_IN_SECONDS}

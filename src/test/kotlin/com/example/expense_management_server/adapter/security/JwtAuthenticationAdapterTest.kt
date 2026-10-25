@@ -47,7 +47,7 @@ class JwtAuthenticationAdapterTest {
             authenticationManager = authenticationManager,
             jwtProperties = JwtProperties(
                 secret = "test-secret",
-                expiration = 3600
+                expirationInSeconds = 3600
             ),
             jwtEncoder = jwtEncoder,
             jwtDecoder = jwtDecoder

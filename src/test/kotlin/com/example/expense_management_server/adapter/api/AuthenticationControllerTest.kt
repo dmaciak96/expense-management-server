@@ -44,7 +44,7 @@ class AuthenticationControllerTest {
             userRegistrationUseCase = userRegistrationUseCase,
             jwtProperties = JwtProperties(
                 secret = "test-secret",
-                expiration = 3600
+                expirationInSeconds = 3600
             ),
             userAccountVerificationUseCase = userAccountVerificationUseCase
         )

@@ -43,7 +43,7 @@ class JwtAuthenticationAdapter(
         val claims = JwtClaimsSet.builder()
             .issuer(ISSUER)
             .issuedAt(now)
-            .expiresAt(now.plusSeconds(jwtProperties.expiration))
+            .expiresAt(now.plusSeconds(jwtProperties.expirationInSeconds))
             .subject(authentication.name)
             .claim(ROLES_CLAIM_KEY, roles)
             .build()
