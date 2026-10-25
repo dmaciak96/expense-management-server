@@ -2,9 +2,7 @@ package com.example.expense_management_server.adapter.api.application_user.model
 
 import com.example.expense_management_server.domain.application_user.model.ApplicationUser
 import com.example.expense_management_server.domain.application_user.model.ApplicationUserStatus
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
 import java.time.Instant
 import java.util.*
 
@@ -14,14 +12,6 @@ data class ApplicationUserUpdateHttpRequest(
 
     @NotBlank
     val lastName: String,
-
-    @NotBlank
-    @Size(min = 6)
-    val password: String,
-
-    @Email
-    @NotBlank
-    val email: String,
 
     val phoneNumber: String?,
     val displayName: String?,
@@ -33,9 +23,9 @@ data class ApplicationUserUpdateHttpRequest(
         lastUpdatedAt = Instant.now(),
         firstName = firstName,
         lastName = lastName,
-        email = email,
+        email = "",
         phoneNumber = phoneNumber,
-        password = password,
+        password = "",
         displayName = displayName,
         avatarUrl = avatarUrl,
         status = ApplicationUserStatus.ACTIVE

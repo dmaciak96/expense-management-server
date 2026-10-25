@@ -1,6 +1,7 @@
 package com.example.expense_management_server.application.application_user
 
 import com.example.expense_management_server.TestConstants
+import com.example.expense_management_server.domain.account_invitation.port.NotificationSenderPort
 import com.example.expense_management_server.domain.application_user.port.UserPersistencePort
 import com.example.expense_management_server.domain.application_user.port.UserValidationPort
 import com.example.expense_management_server.domain.authentication.port.PasswordEncoderPort
@@ -18,11 +19,13 @@ class UserRegistrationUseCaseTest {
     private val userValidationPortTwo: UserValidationPort = mock()
     private val userPersistencePort: UserPersistencePort = mock()
     private val passwordEncoderPort: PasswordEncoderPort = mock()
+    private val notificationSenderPort: NotificationSenderPort = mock()
 
     private val userRegistrationUseCase = UserRegistrationUseCase(
         userDataValidators = listOf(userValidationPortOne, userValidationPortTwo),
         passwordEncoderPort = passwordEncoderPort,
-        userPersistencePort = userPersistencePort
+        userPersistencePort = userPersistencePort,
+        notificationSenderPort = notificationSenderPort
     )
 
     @Test

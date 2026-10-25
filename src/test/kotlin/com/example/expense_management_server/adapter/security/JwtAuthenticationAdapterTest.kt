@@ -1,6 +1,7 @@
 package com.example.expense_management_server.adapter.security
 
 import com.example.expense_management_server.adapter.security.config.JwtProperties
+import com.example.expense_management_server.application.application_user.FetchUserByIdUseCase
 import com.example.expense_management_server.domain.authentication.model.UserAuthentication
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -15,7 +16,9 @@ import org.mockito.kotlin.whenever
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 
@@ -28,7 +31,16 @@ class JwtAuthenticationAdapterTest {
     private lateinit var jwtEncoder: JwtEncoder
 
     @Mock
+    private lateinit var jwtDecoder: JwtDecoder
+
+    @Mock
     private lateinit var authentication: Authentication
+
+    @Mock
+    private lateinit var userDetailsService: UserDetailsService
+
+    @Mock
+    private lateinit var fetchUserByIdUseCase: FetchUserByIdUseCase
 
     @Mock
     private lateinit var jwt: Jwt
@@ -43,9 +55,12 @@ class JwtAuthenticationAdapterTest {
             authenticationManager = authenticationManager,
             jwtProperties = JwtProperties(
                 secret = "test-secret",
-                expiration = 3600
+                expirationInSeconds = 3600
             ),
-            jwtEncoder = jwtEncoder
+            jwtEncoder = jwtEncoder,
+            jwtDecoder = jwtDecoder,
+            userDetailsService = userDetailsService,
+            fetchUserByIdUseCase = fetchUserByIdUseCase
         )
     }
 
