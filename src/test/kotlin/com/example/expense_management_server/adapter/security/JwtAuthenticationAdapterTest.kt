@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 
@@ -26,6 +27,9 @@ class JwtAuthenticationAdapterTest {
 
     @Mock
     private lateinit var jwtEncoder: JwtEncoder
+
+    @Mock
+    private lateinit var jwtDecoder: JwtDecoder
 
     @Mock
     private lateinit var authentication: Authentication
@@ -45,7 +49,8 @@ class JwtAuthenticationAdapterTest {
                 secret = "test-secret",
                 expiration = 3600
             ),
-            jwtEncoder = jwtEncoder
+            jwtEncoder = jwtEncoder,
+            jwtDecoder = jwtDecoder
         )
     }
 

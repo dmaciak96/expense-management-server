@@ -4,6 +4,7 @@ import com.example.expense_management_server.TestConstants
 import com.example.expense_management_server.adapter.api.auth.AuthenticationController
 import com.example.expense_management_server.adapter.api.auth.AuthenticationControllerAdvice
 import com.example.expense_management_server.adapter.security.config.JwtProperties
+import com.example.expense_management_server.application.application_user.UserAccountVerificationUseCase
 import com.example.expense_management_server.application.application_user.UserLoginUseCase
 import com.example.expense_management_server.application.application_user.UserRegistrationUseCase
 import com.example.expense_management_server.domain.application_user.exception.UserAlreadyExistsException
@@ -29,6 +30,9 @@ class AuthenticationControllerTest {
     @Mock
     private lateinit var userRegistrationUseCase: UserRegistrationUseCase
 
+    @Mock
+    private lateinit var userAccountVerificationUseCase: UserAccountVerificationUseCase
+
     private lateinit var mockMvc: MockMvc
 
     @BeforeEach
@@ -41,7 +45,8 @@ class AuthenticationControllerTest {
             jwtProperties = JwtProperties(
                 secret = "test-secret",
                 expiration = 3600
-            )
+            ),
+            userAccountVerificationUseCase = userAccountVerificationUseCase
         )
 
         mockMvc = MockMvcBuilders
